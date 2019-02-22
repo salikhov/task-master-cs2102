@@ -6,11 +6,9 @@
   </head>
   <body>
     <div class="container">
-      <h1>Task Master</h1>
-      <h4>Users List:</h4>
-      <% for(let i = 0; i < users.length; i++) { %>
-        <p><%= users[i].firstname + " " + users[i].lastname %></p>
-      <% } %>
+      <h1>Search Results</h1>
+      <h3>Parameters</h3>
+      <p><%= JSON.stringify(params) %></p>
     </div>
   </body>
 </html>
