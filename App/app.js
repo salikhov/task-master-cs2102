@@ -3,12 +3,14 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
+const bodyParser = require("body-parser");
+const passport = require("passport");
+const session = require("express-session");
 
 // Use dotenv package to load custom .env file
 require("dotenv").load();
 
-const indexRouter = require("./routes/index");
-const searchRouter = require("./routes/search");
+const pool = require("./db");
 
 const app = express();
 
@@ -22,7 +24,53 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// Express Session
+app.use(
+  session({
+    secret: "sql"
+  })
+);
+
+/* Body Parser */
+app.use(bodyParser.urlencoded({ extended: true }));
+
+/* Passport Setup */
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, cb) {
+  cb(null, user.userid);
+});
+
+passport.deserializeUser(function(user, cb) {
+  pool.query(
+    "select userId, firstName, lastName from users where userId=$1",
+    [user],
+    function(err, data) {
+      cb(err, data.rows[0]);
+    }
+  );
+});
+
+const LocalStrategy = require("passport-local").Strategy;
+passport.use(
+  "local",
+  new LocalStrategy(function(username, password, done) {
+    pool.query(
+      "select userId, firstName, lastName from users where userId=$1",
+      [username],
+      function(err, data) {
+        if (err) return done(err);
+        if (data.rowCount === 0) return done(null, false);
+        return done(null, data.rows[0]);
+      }
+    );
+  })
+);
+
 /* Different routers and stuff */
+const indexRouter = require("./routes/index");
+const searchRouter = require("./routes/search");
 app.use("/", indexRouter);
 app.use("/search", searchRouter);
 

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Login</h1>
+      <form action="/login" method="post">
+        <div class="form-group">
+          <label for="uid">User ID</label>
+          <input type="text" class="form-control" id="username" name="username" aria-describedby="uidHelp" placeholder="Enter User ID" required>
+          <input type="hidden" name="password" value="bleh"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+    </div>
+  </body>
+</html>

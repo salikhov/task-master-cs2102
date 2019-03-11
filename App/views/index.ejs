@@ -6,11 +6,9 @@
   </head>
   <body>
     <div class="container">
+      <% if(loggedIn) { %><%= loggedIn.firstname %> <%= loggedIn.lastname %><% } %> 
       <h1>Task Master</h1>
-      <h4>Users List:</h4>
-      <% for(let i = 0; i < users.length; i++) { %>
-        <p><%= users[i].firstname + " " + users[i].lastname %></p>
-      <% } %>
+      <a href="/login" class="btn btn-primary">Login</a>
     </div>
   </body>
 </html>
