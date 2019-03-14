@@ -7,8 +7,9 @@
   <body>
     <div class="container">
         <table class="table">
-            <thead>
+            <thead class="thead-dark">
                 <tr>
+                    <th>ID</th>
                     <th>Name</th>
                     <th>Description</th>
                 </tr>
@@ -16,6 +17,7 @@
             <tbody>
                 <% for(let i = 0; i < services.length; i++) { %>
                     <tr>
+                        <td><%= services[i].serviceid %></td> <!-- NOTE: JS only accepts lowercase letters-->
                         <td><%= services[i].name %></td>
                         <td><%= services[i].description %></td>
                     </tr>

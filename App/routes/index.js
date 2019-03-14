@@ -5,7 +5,7 @@ const pool = require("../db");
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
-  pool.query("select name, description from services", function(err, data) {
+  pool.query("select serviceId, name, description from services", function(err, data) {
     res.render("home", {
       title: "Home",
       services: data.rows,
