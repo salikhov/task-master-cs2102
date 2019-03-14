@@ -3,15 +3,16 @@ const router = express.Router();
 const passport = require("passport");
 const pool = require("../db");
 
-/* Index page */
+/* Index Page */
 router.get("/", function(req, res, next) {
   res.render("index", {
     title: "Home",
+    navCat: "home",
     loggedIn: req.user
   });
 });
 
-/* GET home page. */
+/* Services Listing Page */
 router.get("/services", function(req, res, next) {
   pool.query("select serviceId, name, description from services", function(
     err,
@@ -19,6 +20,7 @@ router.get("/services", function(req, res, next) {
   ) {
     res.render("services", {
       title: "Services",
+      navCat: "services",
       services: data.rows
     });
   });
@@ -39,7 +41,7 @@ router.post(
   "/login",
   passport.authenticate("local", { failureRedirect: "/error" }),
   function(req, res) {
-    res.redirect("/bookingForm");
+    res.redirect("/");
   }
 );
 
