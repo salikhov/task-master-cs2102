@@ -6,9 +6,15 @@
   </head>
   <body>
     <div class="container">
-      <% if(loggedIn) { %><%= loggedIn.firstname %> <%= loggedIn.lastname %><% } %> 
       <h1>Task Master</h1>
-      <a href="/login" class="btn btn-primary">Login</a>
+      <% if (loggedIn) {%>
+        <div class="btn-group">
+          <a href="/logout" class="btn btn-warning">Logout</a>
+          <a href="/bookingForm" class="btn btn-secondary">Booking</a>
+        </div>
+      <% } else { %>
+        <a href="/login" class="btn btn-primary">Login</a>
+      <% } %>
     </div>
   </body>
 </html>

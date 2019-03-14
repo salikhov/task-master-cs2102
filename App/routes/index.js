@@ -14,6 +14,12 @@ router.get("/", function(req, res, next) {
   });
 });
 
+/* Logout */
+router.get("/logout", function(req, res, next) {
+  req.logout();
+  res.redirect("/");
+});
+
 /* Login Form */
 router.get("/login", function(req, res, next) {
   res.render("login", { title: "Login" });
