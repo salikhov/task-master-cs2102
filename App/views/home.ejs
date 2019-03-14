@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead> 
+            <tbody>
+                <% for(let i = 0; i < services.length; i++) { %>
+                    <tr>
+                        <td><%= services[i].serviceid %></td> <!-- NOTE: JS only accepts lowercase letters-->
+                        <td><%= services[i].name %></td>
+                        <td><%= services[i].description %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+  </body>
+</html>
+
