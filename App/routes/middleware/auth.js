@@ -3,6 +3,7 @@ function checkLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
+  req.flash("warning", "You must be logged in to access that page!");
   res.redirect("/login");
 }
 
@@ -11,6 +12,7 @@ function checkLoggedOut(req, res, next) {
   if (!req.isAuthenticated()) {
     return next();
   }
+  req.flash("info", "You are already logged in!");
   res.redirect("/");
 }
 

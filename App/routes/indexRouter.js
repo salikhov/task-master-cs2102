@@ -20,7 +20,7 @@ router.get("/logout", checkLoggedIn, function(req, res, next) {
 });
 
 /* Login Form */
-router.get("/login", function(req, res, next) {
+router.get("/login", checkLoggedOut, function(req, res, next) {
   res.render("login", { title: "Login", navCat: "login", loggedIn: req.user });
 });
 

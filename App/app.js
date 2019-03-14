@@ -6,6 +6,7 @@ const logger = require("morgan");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 const session = require("express-session");
+const flash = require("express-flash");
 
 // Use dotenv package to load custom .env file
 require("dotenv").load();
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(flash());
 
 // Express Session
 app.use(

@@ -41,3 +41,29 @@
     <% } %>
   </div>
 </nav>
+<br />
+<% if (messages.info) { %> <% for (let i = 0; i < messages.info.length; i++) {
+%>
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+  <strong>Hey!</strong> <%= messages.info[i] %>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<% } %> <% } %> <% if (messages.warning) { %> <% for (let i = 0; i <
+messages.warning.length; i++) { %>
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong>Watch Out!</strong> <%= messages.warning[i] %>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<% } %> <% } %> <% if (messages.danger) { %> <% for (let i = 0; i <
+messages.danger.length; i++) { %>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>Attention!</strong> <%= messages.danger[i] %>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<% } %> <% } %>
