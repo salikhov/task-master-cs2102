@@ -1,5 +1,20 @@
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS refers CASCADE;
+DROP TABLE IF EXISTS workers CASCADE;
+DROP TABLE IF EXISTS admins CASCADE;
+DROP TABLE IF EXISTS categories CASCADE;
+DROP TABLE IF EXISTS cityregions CASCADE;
+DROP TABLE IF EXISTS services CASCADE;
+DROP TABLE IF EXISTS approves CASCADE;
+DROP TABLE IF EXISTS monitors CASCADE;
+DROP TABLE IF EXISTS availability CASCADE;
+DROP TABLE IF EXISTS discounts CASCADE;
+DROP TABLE IF EXISTS billingdetails CASCADE;
+DROP TABLE IF EXISTS bookingdetails CASCADE;
+DROP TABLE IF EXISTS reviews CASCADE;
+
 create table users (
-  userId      integer       primary key,
+  userId      serial       primary key,
   firstName   varchar(40)   not null,
   lastName    varchar(40)   not null,
   email       varchar(40)   unique not null,
@@ -14,7 +29,7 @@ create table refers (
 );
 
 create table workers (
-  workerId    integer       primary key,
+  workerId    serial       primary key,
   firstName   varchar(40)   not null,
   lastName    varchar(40)   not null,
   email       varchar(40)   unique not null,
@@ -22,21 +37,21 @@ create table workers (
 );
 
 create table admins (
-  adminId     integer       primary key
+  adminId     serial       primary key
 );
 
 create table categories (
-  catId       integer       primary key,
+  catId       serial       primary key,
   name        varchar(40)   not null
 );
 
 create table cityregions (
-  regionId    integer       primary key,
+  regionId    serial       primary key,
   name        varchar(40)   not null
 );
 
 create table services (
-  serviceId   integer       primary key,
+  serviceId   serial       primary key,
   name        varchar(40)   not null,
   description text          not null default 'N/A',
   price       numeric       not null,
@@ -64,14 +79,14 @@ create table availability (
 );
 
 create table discounts (
-  discountId  integer       primary key,
+  discountId  serial       primary key,
   promoCode   varchar(10)   not null unique,
   amount      numeric, -- we need to add constraints so one of
   percent     numeric  -- these two must be null
 );
 
 create table billingdetails (
-  billingId   integer       primary key,
+  billingId   serial       primary key,
   cardNumber  varchar(16)   not null,
   expDate     varchar(5)    not null,
   cvv         varchar(4)    not null,
@@ -79,9 +94,9 @@ create table billingdetails (
 );
 
 create table bookingdetails (
-  bookingId   integer       primary key,
-  startTime   timestamp     not null,
-  endTime     timestamp     not null,
+  bookingId   serial       primary key,
+  startTime   text     not null,
+  endTime     text     not null,
   address     text          not null,
   comments    text          not null default 'N/A',
   billingId   integer       not null references billingdetails(billingId),
