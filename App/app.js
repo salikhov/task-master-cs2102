@@ -70,17 +70,15 @@ passport.use(
   })
 );
 
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 /* Different routers and stuff */
-const indexRouter = require("./routes/index");
-const searchRouter = require("./routes/search");
-const bookingFormRouter = require('./routes/bookingForm');
-const bookingSummaryRouter = require('./routes/bookingSummary');
+const indexRouter = require("./routes/indexRouter");
+const bookingRouter = require("./routes/bookingRouter");
+const servicesRouter = require("./routes/servicesRouter");
 app.use("/", indexRouter);
-app.use("/search", searchRouter);
-app.use('/bookingForm', bookingFormRouter);
-app.use('/bookingSummary', bookingSummaryRouter);
+app.use("/booking", bookingRouter);
+app.use("/services", servicesRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

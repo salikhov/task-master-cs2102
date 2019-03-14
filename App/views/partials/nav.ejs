@@ -19,9 +19,25 @@
       <li class="nav-item <% if (navCat === 'services') { %>active<% } %>">
         <a class="nav-link" href="/services">Services</a>
       </li>
+      <% if (loggedIn) { %>
       <li class="nav-item <% if (navCat === 'booking') { %>active<% } %>">
-        <a class="nav-link" href="/booking">Booking</a>
+        <a class="nav-link" href="/booking/new">Booking</a>
       </li>
+      <% } %>
     </ul>
+  </div>
+  <div class="navbar-nav">
+    <% if (loggedIn) { %>
+    <span class="navbar-text">
+      Logged in as <%= loggedIn.firstname %> <%= loggedIn.lastname %>
+    </span>
+    <a class="nav-item nav-link" href="/logout">Log Out</a>
+    <% } else { %>
+    <a
+      class="nav-item nav-link <% if (navCat === 'login') { %>active<%}%>"
+      href="/login"
+      >Log In</a
+    >
+    <% } %>
   </div>
 </nav>

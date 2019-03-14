@@ -12,20 +12,6 @@ router.get("/", function(req, res, next) {
   });
 });
 
-/* Services Listing Page */
-router.get("/services", function(req, res, next) {
-  pool.query("select serviceId, name, description from services", function(
-    err,
-    data
-  ) {
-    res.render("services", {
-      title: "Services",
-      navCat: "services",
-      services: data.rows
-    });
-  });
-});
-
 /* Logout */
 router.get("/logout", function(req, res, next) {
   req.logout();
@@ -34,7 +20,7 @@ router.get("/logout", function(req, res, next) {
 
 /* Login Form */
 router.get("/login", function(req, res, next) {
-  res.render("login", { title: "Login" });
+  res.render("login", { title: "Login", navCat: "login", loggedIn: req.user });
 });
 
 router.post(

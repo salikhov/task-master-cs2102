@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include ../partials/head.ejs %>
+
+    <!-- ADDED JavaScript -->
+    <!-- <script src="js/formsScript.js"></script> -->
+    <!-- ADDED jQuery, Moment.js and Date Range Picker for a Date and Time Picker -->
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../partials/nav.ejs %>
+      <h1>Create New Booking</h1>
+      <form id="html_form" action="booking/create" role="form" method="post">
+        <div class="form-group">
+          <label for="startTime">Start Time</label>
+          <input
+            type="text"
+            class="form-control"
+            id="startTime"
+            aria-describedby="startTimeHelp"
+            name="startTime"
+            placeholder="Enter Start Time"
+            required
+          />
+          <script>
+            $(function() {
+              $('input[name="startTime"]').daterangepicker({
+                timePicker: true,
+                singleDatePicker: true,
+                locale: {
+                  format: "YYYY-MM-DD hh:mm A"
+                }
+              });
+            });
+          </script>
+          <small id="startTimeHelp" class="form-text text-muted"
+            >Enter the time you would like work to start</small
+          >
+        </div>
+        <div class="form-group">
+          <label for="endTime">End Time</label>
+          <input
+            type="text"
+            class="form-control"
+            id="endTime"
+            aria-describedby="endTimeHelp"
+            name="endTime"
+            placeholder="Enter End Time"
+            required
+          />
+          <script>
+            $(function() {
+              $('input[name="endTime"]').daterangepicker({
+                timePicker: true,
+                singleDatePicker: true,
+                locale: {
+                  format: "YYYY-MM-DD hh:mm A"
+                }
+              });
+            });
+          </script>
+          <small id="endTimeHelp" class="form-text text-muted"
+            >Enter the time you would like work to end</small
+          >
+        </div>
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input
+            type="text"
+            class="form-control"
+            id="address"
+            placeholder="Enter address"
+            name="address"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="comments">Comments</label>
+          <input
+            type="text"
+            class="form-control"
+            id="comments"
+            placeholder="Enter comments"
+            name="comments"
+          />
+          <small id="commentsHelp" class="form-text text-muted"
+            >Enter any details that will help the worker better understand your
+            needs</small
+          >
+        </div>
+        <div class="form-group">
+          <label for="workerID">Worker ID</label>
+          <br />
+          <select
+            id="workerID"
+            class="form-control"
+            placeholder="Choose the Worker"
+            name="workerID"
+            required
+          >
+            <option value="" hidden>Worker Name</option>
+            <% for(let i = 0; i < workers.length; i++) { %>
+            <option value="<%= workers[i].workerid %>">
+              <%= workers[i].firstname + " " + workers[i].lastname%></option
+            >
+            <% } %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="serviceID">Service ID</label>
+          <br />
+          <select
+            id="serviceID"
+            class="form-control"
+            placeholder="Choose the Service"
+            name="serviceID"
+          >
+            <option value="" hidden>Service Type</option>
+            <% for(let i = 0; i < services.length; i++) { %>
+            <option value="<%= services[i].serviceid %>"
+              ><%= services[i].name + " $" + services[i].price%></option
+            >
+            <% } %>
+          </select>
+        </div>
+        <h2>Billing Details</h2>
+        <div class="form-group">
+          <label for="cardNumber">Card Number</label>
+          <input
+            type="text"
+            class="form-control"
+            id="cardNumber"
+            placeholder="Enter card number"
+            name="cardNumber"
+            required
+          />
+          <small id="cardNumberHelp" class="form-text text-muted"
+            >Must be 16 digits</small
+          >
+        </div>
+        <div class="form-group">
+          <label for="expDate">Expiry Date</label>
+          <input
+            type="text"
+            class="form-control"
+            id="expDate"
+            placeholder="Enter card expiry date"
+            name="expDate"
+            required
+          />
+          <small id="expDateHelp" class="form-text text-muted"
+            >Must be 5 digits</small
+          >
+        </div>
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input
+            type="text"
+            class="form-control"
+            id="cvv"
+            placeholder="Enter card cvv"
+            name="cvv"
+            required
+          />
+          <small id="cvvHelp" class="form-text text-muted"
+            >Must be 4 digits</small
+          >
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <br />
+        <br />
+      </form>
+    </div>
+
+    <script>
+      (function() {
+        window.addEventListener(
+          "load",
+          function() {
+            var forms = [document.getElementById("html_form")];
+            var validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener("submit", check, false);
+            });
+          },
+          false
+        );
+      })();
+    </script>
+  </body>
+</html>
