@@ -3,13 +3,23 @@ const router = express.Router();
 const passport = require("passport");
 const pool = require("../db");
 
-/* GET home page. */
+/* Index page */
 router.get("/", function(req, res, next) {
-  pool.query("select serviceId, name, description from services", function(err, data) {
-    res.render("home", {
-      title: "Home",
-      services: data.rows,
-      loggedIn: req.user
+  res.render("index", {
+    title: "Home",
+    loggedIn: req.user
+  });
+});
+
+/* GET home page. */
+router.get("/services", function(req, res, next) {
+  pool.query("select serviceId, name, description from services", function(
+    err,
+    data
+  ) {
+    res.render("services", {
+      title: "Services",
+      services: data.rows
     });
   });
 });
