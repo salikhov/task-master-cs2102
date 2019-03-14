@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const { checkLoggedIn, checkLoggedOut } = require("./middleware/auth");
 const pool = require("../db");
 
 /* Index Page */
@@ -13,7 +14,7 @@ router.get("/", function(req, res, next) {
 });
 
 /* Logout */
-router.get("/logout", function(req, res, next) {
+router.get("/logout", checkLoggedIn, function(req, res, next) {
   req.logout();
   res.redirect("/");
 });
@@ -25,7 +26,8 @@ router.get("/login", function(req, res, next) {
 
 router.post(
   "/login",
-  passport.authenticate("local", { failureRedirect: "/error" }),
+  checkLoggedOut,
+  passport.authenticate("local", { failureRedirect: "/" }),
   function(req, res) {
     res.redirect("/");
   }
