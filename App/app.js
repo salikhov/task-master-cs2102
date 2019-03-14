@@ -27,7 +27,9 @@ app.use(express.static(path.join(__dirname, "public")));
 // Express Session
 app.use(
   session({
-    secret: "sql"
+    secret: "sql",
+    resave: true,
+    saveUninitialized: true
   })
 );
 
@@ -68,11 +70,17 @@ passport.use(
   })
 );
 
+app.use(express.static('public'));
+
 /* Different routers and stuff */
 const indexRouter = require("./routes/index");
 const searchRouter = require("./routes/search");
+const bookingFormRouter = require('./routes/bookingForm');
+const bookingSummaryRouter = require('./routes/bookingSummary');
 app.use("/", indexRouter);
 app.use("/search", searchRouter);
+app.use('/bookingForm', bookingFormRouter);
+app.use('/bookingSummary', bookingSummaryRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
