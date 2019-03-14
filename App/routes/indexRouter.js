@@ -29,6 +29,7 @@ router.post(
   checkLoggedOut,
   passport.authenticate("local", { failureRedirect: "/" }),
   function(req, res) {
+    req.flash("success", "You have successfully logged in!");
     res.redirect("/");
   }
 );

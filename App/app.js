@@ -29,7 +29,7 @@ app.use(flash());
 // Express Session
 app.use(
   session({
-    secret: "sql",
+    secret: process.env.SECRET,
     resave: true,
     saveUninitialized: true
   })

@@ -66,4 +66,12 @@ messages.danger.length; i++) { %>
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
+<% } %> <% } %> <% if (messages.success) { %> <% for (let i = 0; i <
+messages.success.length; i++) { %>
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong>Success!</strong> <%= messages.success[i] %>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
 <% } %> <% } %>
