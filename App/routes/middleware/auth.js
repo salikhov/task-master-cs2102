@@ -1,3 +1,7 @@
+const pool = require("../../db/index");
+
+function nullFunction() {}
+
 // Function to check if user is logged in
 function checkLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
@@ -16,5 +20,53 @@ function checkLoggedOut(req, res, next) {
   res.redirect("/");
 }
 
+// Function for checking that the user type account is created
+function checkUserLoggedIn(req, res, next) {
+  checkLoggedIn(req, res, nullFunction);
+  pool.query("select 1 from users where id=$1", [req.user.id], function(
+    err,
+    data
+  ) {
+    if (!err && data.rowCount !== 0) {
+      return next();
+    }
+    req.flash("warning", "You cannot access that page!");
+    res.redirect("/");
+  });
+}
+
+// Function for checking that the worker type account is created
+function checkWorkerLoggedIn(req, res, next) {
+  checkLoggedIn(req, res, nullFunction);
+  pool.query("select 1 from workers where id=$1", [req.user.id], function(
+    err,
+    data
+  ) {
+    if (!err && data.rowCount !== 0) {
+      return next();
+    }
+    req.flash("warning", "You cannot access that page!");
+    res.redirect("/");
+  });
+}
+
+// Function for checking that the admin type account is created
+function checkAdminLoggedIn(req, res, next) {
+  checkLoggedIn(req, res, nullFunction);
+  pool.query("select 1 from admins where id=$1", [req.user.id], function(
+    err,
+    data
+  ) {
+    if (!err && data.rowCount !== 0) {
+      return next();
+    }
+    req.flash("warning", "You cannot access that page!");
+    res.redirect("/");
+  });
+}
+
 module.exports.checkLoggedIn = checkLoggedIn;
+module.exports.checkUserLoggedIn = checkUserLoggedIn;
 module.exports.checkLoggedOut = checkLoggedOut;
+module.exports.checkWorkerLoggedIn = checkWorkerLoggedIn;
+module.exports.checkAdminLoggedIn = checkAdminLoggedIn;

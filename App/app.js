@@ -43,12 +43,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, cb) {
-  cb(null, user.userid);
+  cb(null, user.id);
 });
 
 passport.deserializeUser(function(user, cb) {
   pool.query(
-    "select userId, firstName, lastName from users where userId=$1",
+    "select id, email, firstName, lastName from accounts where id=$1",
     [user],
     function(err, data) {
       cb(err, data.rows[0]);
@@ -56,19 +56,33 @@ passport.deserializeUser(function(user, cb) {
   );
 });
 
+const { getPasswordHash } = require("./db/account");
 const LocalStrategy = require("passport-local").Strategy;
 passport.use(
   "local",
-  new LocalStrategy(function(username, password, done) {
-    pool.query(
-      "select userId, firstName, lastName from users where userId=$1",
-      [username],
-      function(err, data) {
-        if (err) return done(err);
-        if (data.rowCount === 0) return done(null, false);
-        return done(null, data.rows[0]);
-      }
-    );
+  new LocalStrategy(function(email, password, done) {
+    pool.query("select salt from accounts where email=$1", [email], function(
+      err,
+      data
+    ) {
+      if (err) return done(err);
+      if (data.rowCount === 0)
+        return done(null, false, {
+          message: "You entered an incorrect email or password!"
+        });
+      pool.query(
+        "select id, email, firstName, lastName from accounts where email=$1 and hash=$2",
+        [email, getPasswordHash(data.rows[0].salt, password)],
+        function(err, data) {
+          if (err) return done(err);
+          if (data.rowCount === 0)
+            return done(null, false, {
+              message: "You entered an incorrect email or password!"
+            });
+          return done(null, data.rows[0]);
+        }
+      );
+    });
   })
 );
 
