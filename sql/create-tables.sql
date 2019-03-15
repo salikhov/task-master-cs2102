@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS accounts CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS refers CASCADE;
 DROP TABLE IF EXISTS workers CASCADE;
@@ -13,31 +14,34 @@ DROP TABLE IF EXISTS billingdetails CASCADE;
 DROP TABLE IF EXISTS bookingdetails CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 
-create table users (
-  userId      serial       primary key,
+create table accounts (
+  id          serial        primary key,
+  email       varchar(254)  unique not null,
+  salt        varchar(16)   not null,
+  hash        text          not null,
   firstName   varchar(40)   not null,
-  lastName    varchar(40)   not null,
-  email       varchar(40)   unique not null,
+  lastName    varchar(40)   not null
+);
+
+create table users (
+  id          serial        primary key references accounts(id),
   phone       varchar(40)   not null,
   address     text
 );
 
 create table refers (
-  referrerId  integer       not null references users(userId),
-  userId      integer       unique not null references users(userId),
+  referrerId  integer       not null references users(id),
+  userId      integer       unique not null references users(id),
   primary key(referrerId, userId)
 );
 
 create table workers (
-  workerId    serial       primary key,
-  firstName   varchar(40)   not null,
-  lastName    varchar(40)   not null,
-  email       varchar(40)   unique not null,
+  id          serial        primary key references accounts(id),
   phone       varchar(40)   not null
 );
 
 create table admins (
-  adminId     serial       primary key
+  id          serial        primary key references accounts(id)
 );
 
 create table categories (
@@ -55,27 +59,28 @@ create table services (
   name        varchar(40)   not null,
   description text          not null default 'N/A',
   price       numeric       not null,
-  workerId    integer       not null references workers(workerId),
+  workerId    integer       not null references workers(id),
   catId       integer       not null references categories(catId),
   regionId    integer       not null references cityregions(regionId)
 );
 
 create table approves (
-  workerId    integer       primary key references workers(workerId),
+  workerId    integer       primary key references workers(id),
   approved    boolean       not null default FALSE,
-  adminId     integer       references admins(adminId)
+  adminId     integer       references admins(id)
 );
 
 create table monitors (
   serviceId   integer       primary key references services(serviceId),
   active      boolean       not null default TRUE,
-  adminId     integer       not null references admins(adminId)
+  adminId     integer       not null references admins(id)
 );
 
 create table availability (
-  workerId    integer       not null references workers(workerId),
+  workerId    integer       not null references workers(id),
   startTime   timestamp     not null,
-  endTime     timestamp     not null
+  endTime     timestamp     not null,
+  primary key(workerId, startTime, endTime)
 );
 
 create table discounts (
@@ -100,14 +105,14 @@ create table bookingdetails (
   address     text          not null,
   comments    text          not null default 'N/A',
   billingId   integer       not null references billingdetails(billingId),
-  userId      integer       not null references users(userId),
-  workerId    integer       not null references workers(workerId),
+  userId      integer       not null references users(id),
+  workerId    integer       not null references workers(id),
   serviceId   integer       not null references services(serviceId)
 );
 
 create table reviews (
-  userId      integer       not null references users(userId),
-  workerId    integer       not null references workers(workerId),
+  userId      integer       not null references users(id),
+  workerId    integer       not null references workers(id),
   bookingId   integer       unique not null references bookingdetails(bookingId),
   rating      integer       not null,
   review      text
