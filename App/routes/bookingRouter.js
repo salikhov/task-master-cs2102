@@ -1,13 +1,24 @@
 const async = require("async");
 const express = require("express");
 const router = express.Router();
-const { checkUserLoggedIn } = require("./middleware/auth");
+const { checkLoggedIn, checkUserLoggedIn } = require("./middleware/auth");
 const pool = require("../db");
 
 let return_data = {};
 
-// GET
-router.get("/new", checkUserLoggedIn, function(req, res, next) {
+/* GET index - Booking Index Page */
+router.get("/", checkLoggedIn, function(req, res, next) {
+  res.render("booking/index", {
+    title: "Booking",
+    navCat: "booking",
+    loggedIn: req.user
+  });
+});
+
+// This is a post because you should only be able to get to it when you click on
+// a button from the services page, you shouldn't just be able to type it in
+/* POST new - Booking Form */
+router.post("/new", checkUserLoggedIn, function(req, res, next) {
   async.parallel(
     [
       function(parallel_done) {
@@ -33,7 +44,7 @@ router.get("/new", checkUserLoggedIn, function(req, res, next) {
     ],
     function(err) {
       if (err) console.log(err);
-      res.render("booking/bookingNew", {
+      res.render("booking/new", {
         title: "New Booking",
         navCat: "booking",
         workers: return_data.workers.rows,
@@ -44,7 +55,7 @@ router.get("/new", checkUserLoggedIn, function(req, res, next) {
   );
 });
 
-// POST
+/* POST create - Create Booking Action */
 router.post("/create", checkUserLoggedIn, function(req, res, next) {
   // Retrieve Information
   const startTime = req.body.startTime;
@@ -104,7 +115,7 @@ router.post("/create", checkUserLoggedIn, function(req, res, next) {
             "';";
 
           pool.query(retrieveBookingID_query, (err, data5) => {
-            res.render("booking/bookingSummary", {
+            res.render("booking/summary", {
               workerDetails: data4.rows[0],
               title: "Booking Summary",
               navCat: "booking",
