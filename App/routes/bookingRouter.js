@@ -6,10 +6,35 @@ const pool = require("../db");
 
 let return_data = {};
 
+function checkPermissions(req, res, next) {
+  if (true) return next(); // this should happen if the user has permission to view booking summary
+  // to access user id do req.user.id
+  // to access the requested booking id use req.params.id
+  // then run some queries to make sure the user can view its details
+}
+
 /* GET index - Booking Index Page */
 router.get("/", checkLoggedIn, function(req, res, next) {
   res.render("booking/index", {
     title: "Booking",
+    navCat: "booking",
+    loggedIn: req.user
+  });
+});
+
+/* GET view - Booking Summary Page for Particular Booking */
+router.get("/view/:id", checkLoggedIn, checkPermissions, function(
+  req,
+  res,
+  next
+) {
+  // you can access the value of :id by using req.params.id
+  // basically you would enter something like /booking/view/5 into the browser
+  // and this page should show you a summary of it if it exists
+  // and if you have permission to view it (you're either the worker or user in it)
+  // this page basically deprecates summary
+  res.render("booking/view", {
+    title: "Booking Summary",
     navCat: "booking",
     loggedIn: req.user
   });
@@ -114,6 +139,7 @@ router.post("/create", checkUserLoggedIn, function(req, res, next) {
             startTime +
             "';";
 
+          // TODO redirect to view instead of summary
           pool.query(retrieveBookingID_query, (err, data5) => {
             res.render("booking/summary", {
               workerDetails: data4.rows[0],
