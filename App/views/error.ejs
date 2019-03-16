@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <% title = "Error: " + error.status %>
-    <%- include partials/head.ejs %>
+    <% title = "Error: " + error.status %> <%- include _partials/head.ejs %>
   </head>
   <body>
     <div class="container">
       <h1><%= message %></h1>
       <h2><%= error.status %></h2>
       <pre><%= error.stack %></pre>
-    </div>  
+    </div>
   </body>
 </html>
-

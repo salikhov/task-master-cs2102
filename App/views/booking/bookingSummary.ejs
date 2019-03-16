@@ -2,7 +2,7 @@
 <html>
   <head>
     <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
-    <%- include ../partials/head.ejs %>
+    <%- include ../_partials/head.ejs %>
     <style>
       table,
       th,
@@ -13,7 +13,7 @@
   </head>
   <body>
     <div class="container">
-      <%- include ../partials/nav.ejs %>
+      <%- include ../_partials/nav.ejs %>
       <h1>Task Master: <%= title%></h1>
       <p>
         <% if(loggedIn) { %>Thank you for booking, <%= loggedIn.firstname %> <%=
