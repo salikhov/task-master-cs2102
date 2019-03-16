@@ -19,7 +19,7 @@
       <li class="nav-item <% if (navCat === 'services') { %>active<% } %>">
         <a class="nav-link" href="/services">Services</a>
       </li>
-      <% if (loggedIn) { %>
+      <% if (loggedIn && loggedIn.isuser) { %>
       <li class="nav-item <% if (navCat === 'booking') { %>active<% } %>">
         <a class="nav-link" href="/booking/new">Booking</a>
       </li>

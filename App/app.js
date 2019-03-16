@@ -48,7 +48,7 @@ passport.serializeUser(function(user, cb) {
 
 passport.deserializeUser(function(user, cb) {
   pool.query(
-    "select id, email, firstName, lastName from accounts where id=$1",
+    "select id, email, firstName, lastName, isUser, isWorker, isAdmin from accounts natural join accountTypes where id=$1",
     [user],
     function(err, data) {
       cb(err, data.rows[0]);
@@ -71,7 +71,7 @@ passport.use(
           message: "You entered an incorrect email or password!"
         });
       pool.query(
-        "select id, email, firstName, lastName from accounts where email=$1 and hash=$2",
+        "select id, email, firstName, lastName, isUser, isWorker, isAdmin from accounts natural join accountTypes where email=$1 and hash=$2",
         [email, getPasswordHash(data.rows[0].salt, password)],
         function(err, data) {
           if (err) return done(err);
