@@ -27,7 +27,11 @@
     </ul>
   </div>
   <ul class="navbar-nav">
-    <% if (loggedIn) { %>
+    <% if (loggedIn) { %> <% if (loggedIn.isadmin ) { %>
+    <li class="nav-item <% if (navCat === 'admin') { %>active<% } %>">
+      <a class="nav-link" href="/admin">Admin</a>
+    </li>
+    <% } %>
     <li class="nav-item <% if (navCat === 'account') { %>active<% } %>">
       <a class="nav-link" href="/account">Profile</a>
     </li>
