@@ -92,9 +92,11 @@ app.use(express.static("public"));
 const indexRouter = require("./routes/indexRouter");
 const bookingRouter = require("./routes/bookingRouter");
 const servicesRouter = require("./routes/servicesRouter");
+const accountRouter = require("./routes/accountRouter");
 app.use("/", indexRouter);
 app.use("/booking", bookingRouter);
 app.use("/services", servicesRouter);
+app.use("/account", accountRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
