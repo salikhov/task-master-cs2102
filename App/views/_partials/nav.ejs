@@ -26,20 +26,24 @@
       <% } %>
     </ul>
   </div>
-  <div class="navbar-nav">
+  <ul class="navbar-nav">
     <% if (loggedIn) { %>
-    <span class="navbar-text">
-      Logged in as <%= loggedIn.firstname %> <%= loggedIn.lastname %>
-    </span>
-    <a class="nav-item nav-link" href="/account/logout">Log Out</a>
+    <li class="nav-item <% if (navCat === 'account') { %>active<% } %>">
+      <a class="nav-link" href="/account">Profile</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/account/logout">Log Out</a>
+    </li>
     <% } else { %>
-    <a
-      class="nav-item nav-link <% if (navCat === 'login') { %>active<%}%>"
-      href="/account/login"
-      >Log In</a
-    >
+    <li class="nav-item">
+      <a
+        class="nav-link <% if (navCat === 'login') { %>active<%}%>"
+        href="/account/login"
+        >Log In</a
+      >
+    </li>
     <% } %>
-  </div>
+  </ul>
 </nav>
 <br />
 <% if (messages.info) { %> <% for (let i = 0; i < messages.info.length; i++) {

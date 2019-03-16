@@ -42,14 +42,43 @@ router.all("/logout", checkLoggedIn, function(req, res, next) {
   res.redirect("/");
 });
 
-router.get("/refer", checkUserLoggedIn, function(req, res, next) {
-  res.render("account/refer", {
-    title: "Refer a Friend",
-    navCat: "",
+/* =====================================
+   ============= OPERATIONS ============
+   ===================================== */
+
+/* GET - Summary page (profile) */
+router.get("/", checkLoggedIn, function(req, res, next) {
+  res.render("account/index", {
+    title: "Account",
+    navCat: "account",
     loggedIn: req.user
   });
 });
 
+/* GET edit - Edit account details */
+router.get("/edit", checkLoggedIn, function(req, res, next) {
+  res.render("account/edit", {
+    title: "Edit Account",
+    navCat: "account",
+    loggedIn: req.user
+  });
+});
+
+/* PUT update - Edit account action */
+router.put("/update", checkLoggedIn, function(req, res, next) {
+  // This is where the stuff that actually updates the account goes
+});
+
+/* GET refer - Referral page */
+router.get("/refer", checkUserLoggedIn, function(req, res, next) {
+  res.render("account/refer", {
+    title: "Refer a Friend",
+    navCat: "account",
+    loggedIn: req.user
+  });
+});
+
+/* POST refer - Referral action */
 router.post("/refer", checkUserLoggedIn, function(req, res, next) {
   res.json(req.body.email);
 });

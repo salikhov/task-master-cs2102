@@ -8,7 +8,7 @@ function checkLoggedIn(req, res, next) {
     return next();
   }
   req.flash("warning", "You must be logged in to access that page!");
-  res.redirect("/login");
+  res.redirect("/account/login");
 }
 
 // Function for checking if user is already logged in
