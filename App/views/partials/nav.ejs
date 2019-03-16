@@ -31,11 +31,11 @@
     <span class="navbar-text">
       Logged in as <%= loggedIn.firstname %> <%= loggedIn.lastname %>
     </span>
-    <a class="nav-item nav-link" href="/logout">Log Out</a>
+    <a class="nav-item nav-link" href="/account/logout">Log Out</a>
     <% } else { %>
     <a
       class="nav-item nav-link <% if (navCat === 'login') { %>active<%}%>"
-      href="/login"
+      href="/account/login"
       >Log In</a
     >
     <% } %>

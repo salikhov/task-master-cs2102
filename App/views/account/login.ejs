@@ -2,13 +2,13 @@
 <html>
   <head>
     <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
-    <%- include partials/head.ejs %>
+    <%- include ../partials/head.ejs %>
   </head>
   <body>
     <div class="container">
-      <%- include partials/nav.ejs %>
+      <%- include ../partials/nav.ejs %>
       <h1>Log In</h1>
-      <form action="/login" method="post">
+      <form action="login" method="post">
         <div class="form-group">
           <label for="email">Email</label>
           <input
