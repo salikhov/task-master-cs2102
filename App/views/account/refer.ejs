@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../partials/nav.ejs %>
+      <h1>Refer a Friend</h1>
+      <form action="refer" method="post">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            placeholder="Email"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Send Referral</button>
+      </form>
+    </div>
+  </body>
+</html>

@@ -16,9 +16,13 @@
     "express-flash": "0.0.2",
     "express-session": "^1.15.6",
     "http-errors": "~1.6.2",
+    "jsonwebtoken": "^8.5.0",
     "morgan": "~1.9.0",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pg": "^7.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10"
   }
 }

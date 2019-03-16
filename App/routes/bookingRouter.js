@@ -1,13 +1,13 @@
 const async = require("async");
 const express = require("express");
 const router = express.Router();
-const { checkLoggedIn } = require("./middleware/auth");
+const { checkUserLoggedIn } = require("./middleware/auth");
 const pool = require("../db");
 
 let return_data = {};
 
 // GET
-router.get("/new", checkLoggedIn, function(req, res, next) {
+router.get("/new", checkUserLoggedIn, function(req, res, next) {
   async.parallel(
     [
       function(parallel_done) {
@@ -21,14 +21,14 @@ router.get("/new", checkLoggedIn, function(req, res, next) {
         });
       },
       function(parallel_done) {
-        pool.query("select * from workers order by firstname asc", function(
-          err,
-          workers
-        ) {
-          if (err) return parallel_done(err);
-          return_data.workers = workers;
-          parallel_done();
-        });
+        pool.query(
+          "select * from workers natural join accounts order by firstname asc",
+          function(err, workers) {
+            if (err) return parallel_done(err);
+            return_data.workers = workers;
+            parallel_done();
+          }
+        );
       }
     ],
     function(err) {
@@ -45,7 +45,7 @@ router.get("/new", checkLoggedIn, function(req, res, next) {
 });
 
 // POST
-router.post("/create", checkLoggedIn, function(req, res, next) {
+router.post("/create", checkUserLoggedIn, function(req, res, next) {
   // Retrieve Information
   const startTime = req.body.startTime;
   const endTime = req.body.endTime;
