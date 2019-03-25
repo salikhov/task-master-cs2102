@@ -17,15 +17,15 @@ DROP TABLE IF EXISTS reviews CASCADE;
 create table accounts (
   id          serial        primary key,
   email       varchar(254)  unique not null,
-  salt        varchar(16)   not null,
+  salt        varchar(32)   not null,
   hash        text          not null,
   firstName   varchar(40)   not null,
   lastName    varchar(40)   not null
 );
 
 create table users (
-  id          serial        primary key references accounts(id),
-  phone       varchar(40)   not null,
+  id          serial        primary key references accounts(id) on delete cascade,
+  phone       varchar(40),
   address     text
 );
 
@@ -36,12 +36,12 @@ create table refers (
 );
 
 create table workers (
-  id          serial        primary key references accounts(id),
-  phone       varchar(40)   not null
+  id          serial        primary key references accounts(id) on delete cascade,
+  phone       varchar(40)
 );
 
 create table admins (
-  id          serial        primary key references accounts(id)
+  id          serial        primary key references accounts(id) on delete cascade
 );
 
 create table categories (

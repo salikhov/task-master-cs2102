@@ -6,4 +6,9 @@ function getPasswordHash(salt, password) {
     .toString("hex");
 }
 
+function generateSalt() {
+  return crypto.randomBytes(16).toString("hex");
+}
+
 module.exports.getPasswordHash = getPasswordHash;
+module.exports.generateSalt = generateSalt;
