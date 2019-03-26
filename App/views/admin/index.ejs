@@ -5,9 +5,74 @@
     <%- include ../_partials/head.ejs %>
   </head>
   <body>
+
     <div class="container">
       <%- include ../_partials/nav.ejs %>
       <h1>Admin Panel</h1>
+      <h3>Need Approval</h3>
+      <table class="table">
+      <thead class="thead-dark">
+        <tr>
+        <th>Worker ID</th>
+        <th>Worker Name</th>
+        <th>Needs Approved</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for(let i = 0; i < notapprovedusers.length; i++) { %>
+        <tr>
+        <td><%= notapprovedusers[i].workerid %></td>
+        <td><%= notapprovedusers[i].firstname + " " + notapprovedusers[i].lastname %></td>
+        <td><%= !notapprovedusers[i].approved%></td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <h3>Rating of Workers</h3>
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+        <th>Worker ID</th>
+        <th>Worker Name</th>
+        <th>Average Rating</th>
+        <th>Max Rating</th>
+        <th>Min Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for(let i = 0; i < workerratings.length; i++) { %>
+        <tr>
+        <td><%= workerratings[i].workerid %></td>
+        <td><%= workerratings[i].firstname + +  workerratings[i].lastname%></td>
+        <td><%= workerratings[i].averagerating %></td>
+        <td><%= workerratings[i].minrating %></td>
+        <td><%= workerratings[i].maxrating %></td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <h3>Monitor</h3>
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for(let i = 0; i < monit.length; i++) { %>
+        <tr>
+        <td><%= monit[i].serviceid %></td>
+        <td><%= monit[i].active %></td>
+        <td><%= monit[i].adminid %></td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+
     </div>
   </body>
 </html>
