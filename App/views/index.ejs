@@ -4,12 +4,18 @@
     <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
     <%- include _partials/head.ejs %>
   </head>
-  <body>
+  <body style="background-image: url(/images/bluebrush.jpg); height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;">
+
     <div class="container">
       <%- include _partials/nav.ejs %>
-      <h1>Welcome to Task Master!</h1>
-      <div class="jumbotron">
-        <h3>Content coming soon!</h3>
+      <h1><center>Welcome to Task Master!</center></h1>
+      <div class="jumbotron"">
+        <h1 class = 'a' > 
+          <center>The convenient & affordable way to get things done around the home</center>
+        </h1>
       </div>
     </div>
   </body>
