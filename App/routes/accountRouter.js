@@ -184,18 +184,69 @@ router.get("/", checkLoggedIn, function(req, res, next) {
   });
 });
 
-/* GET edit - Edit account details */
+/* GET - Edit account details */
 router.get("/edit", checkLoggedIn, function(req, res, next) {
-  res.render("account/edit", {
-    title: "Edit Account",
-    navCat: "account",
-    loggedIn: req.user
+  pool.query("select phone, address from users where id=$1", [req.user.id], function(
+    err,
+    userData
+  ) {
+    pool.query("select phone from workers where id=$1", [req.user.id], function(
+      err,
+      workerData
+    ){
+      res.render("account/edit", {
+        title: "Edit Account",
+        navCat: "account",
+        userData: userData.rows,
+        workerData: workerData.rows,
+        loggedIn: req.user
+      });
+    });
   });
 });
 
-/* PUT update - Edit account action */
-router.put("/update", checkLoggedIn, function(req, res, next) {
-  // This is where the stuff that actually updates the account goes
+/* POST update - Edit account action */
+router.post("/update1", checkLoggedIn, function(req, res, next) {
+  /* if (req.body.password !== req.body.confirm) {
+    req.flash(
+      "warning",
+      "Make sure you type the same password in both fields!"
+    );
+    res.redirect("/account/edit");
+    return;
+  } */
+  if (!(req.body.userCheck || req.body.workerCheck) && !req.user.isadmin) {
+    req.flash("warning", "You must select at least one account type!");
+    res.redirect("/account/edit");
+    return;
+  }
+  pool.query(
+    "update accounts set firstName=$1, lastName=$2 where id=$3", [req.body.firstName, req.body.lastName, req.user.id], 
+    function(err, updateData) {
+      res.redirect("/account")
+    }
+  );
+});
+
+/* POST update - Edit user action */
+router.post("/update2", checkLoggedIn, function(req, res, next) {
+  console.log(req.body)
+  pool.query(
+    "update users set phone=$1, address=$2 where id=$3", [req.body.phone, req.body.address, req.user.id], 
+    function(err, updateData) {
+      res.redirect("/account")
+    }
+  );
+});
+
+/* POST update - Edit worker action */
+router.post("/update3", checkLoggedIn, function(req, res, next) {
+  pool.query(
+    "update workers set phone=$1 where id=$2", [req.body.phone, req.user.id], 
+    function(err, updateData) {
+      res.redirect("/account")
+    }
+  );
 });
 
 /* GET refer - Referral page */
