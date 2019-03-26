@@ -174,7 +174,6 @@ router.post("/register", checkLoggedOut, function(req, res, next) {
 /* =====================================
    ============= OPERATIONS ============
    ===================================== */
-// this is for buddy
 /* GET - Summary page (profile) */
 router.get("/", checkLoggedIn, function(req, res, next) {
   pool.query("select bookingid,t3.name as cleaningname,price,starttime,endtime,address,firstname,lastname,email,t4.phone "
