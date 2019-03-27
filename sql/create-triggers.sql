@@ -84,7 +84,7 @@ begin
   for temprow in select starttime, endtime from availability where workerid=new.workerid
 	and (overlaps(starttime, endtime, new.starttime, new.endtime)
 	or new.endtime=starttime or new.starttime=endtime)
-	and new.starttime <> starttime and new.endtime <> endtime
+	and (new.starttime <> starttime or new.endtime <> endtime)
   loop
   	raise notice 'OVERLAP S: %, E: %', temprow.starttime, temprow.endtime;
   	if temprow.starttime >= new.starttime and temprow.endtime <= new.endtime then
