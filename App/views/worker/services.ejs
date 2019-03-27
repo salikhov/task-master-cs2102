@@ -8,6 +8,8 @@
     <div class="container">
       <%- include ../_partials/nav.ejs %> <%- include ./_partials/navtabs.ejs %>
       <h4>Services Offered</h4>
+      <a href="/worker/services/new" class="btn btn-primary">New Service</a>
+      <br /><br />
       <% if (services.length === 0) { %>
       <p>You are not currently offering any services. Add a new one!</p>
       <% } else { %>

@@ -160,4 +160,49 @@ router.get(
   }
 );
 
+router.get("/services/new", checkWorkerLoggedIn, function(req, res, next) {
+  pool.query("select * from categories", function(err, data1) {
+    if (err) {
+      genericError(req, res, "/worker/services");
+      return;
+    }
+    pool.query("select * from cityregions", function(err, data2) {
+      if (err) {
+        genericError(req, res, "/worker/services");
+        return;
+      }
+      res.render("worker/services_new", {
+        title: "New Service",
+        navCat: "worker",
+        wNavCat: "services",
+        categories: data1.rows,
+        regions: data2.rows,
+        loggedIn: req.user
+      });
+    });
+  });
+});
+
+router.post("/services/create", checkWorkerLoggedIn, function(req, res, next) {
+  pool.query(
+    "insert into services (name, description, price, catid, regionid, workerid) values ($1, $2, $3, $4, $5, $6)",
+    [
+      req.body.sname,
+      req.body.description,
+      req.body.price,
+      req.body.category,
+      req.body.region,
+      req.user.id
+    ],
+    function(err, data) {
+      if (err) {
+        genericError(req, res, "/worker/services");
+        return;
+      }
+      req.flash("success", "Service created");
+      res.redirect("/worker/services");
+    }
+  );
+});
+
 module.exports = router;
