@@ -31,6 +31,10 @@
     <li class="nav-item <% if (navCat === 'admin') { %>active<% } %>">
       <a class="nav-link" href="/admin">Admin</a>
     </li>
+    <% } %> <% if (loggedIn.isworker) { %>
+    <li class="nav-item <% if (navCat === 'worker') { %>active<% } %>">
+      <a class="nav-link" href="/worker">Worker</a>
+    </li>
     <% } %>
     <li class="nav-item <% if (navCat === 'account') { %>active<% } %>">
       <a class="nav-link" href="/account">Profile</a>
