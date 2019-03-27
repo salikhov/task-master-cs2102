@@ -78,9 +78,10 @@ create table monitors (
 
 create table availability (
   workerId    integer       not null references workers(id),
-  startTime   timestamp     not null,
-  endTime     timestamp     not null,
-  primary key(workerId, startTime, endTime)
+  startTime   timestamp     not null check (startTime > NOW()),
+  endTime     timestamp     not null check (endTime > NOW()),
+  primary key(workerId, startTime, endTime),
+  check(endTime > startTime)
 );
 
 create table discounts (
