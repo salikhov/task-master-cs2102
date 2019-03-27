@@ -84,22 +84,26 @@ begin
   for temprow in select starttime, endtime from availability where workerid=new.workerid
 	and (overlaps(starttime, endtime, new.starttime, new.endtime)
 	or new.endtime=starttime or new.starttime=endtime)
-	and (new.starttime <> starttime or new.endtime <> endtime)
+	and (coalesce(old.starttime, new.starttime) <> starttime or coalesce(old.endtime, new.endtime) <> endtime)
   loop
   	raise notice 'OVERLAP S: %, E: %', temprow.starttime, temprow.endtime;
   	if temprow.starttime >= new.starttime and temprow.endtime <= new.endtime then
+  		raise notice 'RESOLVING OVERLAP encompass strategy';
   		-- if the conflict is fully encompassed by the new range then delete the conflict
   		delete from availability where workerid=new.workerid and starttime=temprow.starttime and endtime=temprow.endtime;
   	elsif temprow.starttime < new.starttime and temprow.endtime > new.endtime then
+  		raise notice 'RESOLVING OVERLAP conflict strategy';
   		-- if the conflict fully encompasses the new range then ignore the new range
   		-- can immediately return since there should be no other conflicts
   		return null;
   	elsif temprow.starttime <= new.starttime and temprow.endtime <= new.endtime then
+  		raise notice 'RESOLVING OVERLAP merge left strategy';
   		delete from availability where workerid=new.workerid and starttime=temprow.starttime and endtime=temprow.endtime;
   		insert into availability (workerid, starttime, endtime) values (new.workerid, temprow.starttime, new.endtime);
 		return null;
   	elsif temprow.endtime >= new.endtime and temprow.starttime <= new.endtime then
-  		new.endtime = temprow.endtime;
+  		raise notice 'RESOLVING OVERLAP merge right strategy';
+  		new.endtime := temprow.endtime;
   		delete from availability where workerid=new.workerid and starttime=temprow.starttime and endtime=temprow.endtime;
   	end if;
   end loop;

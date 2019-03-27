@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"
+    ></script>
+    <script type="text/javascript" src="/js/availabilityValidation.js"></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %> <%- include ./_partials/navtabs.ejs %>
+      <h4>Add Availability</h4>
+      <form
+        action="/worker/availability/create"
+        method="post"
+        onsubmit="return validateSubmit(event.target);"
+      >
+        <div class="form-row">
+          <div class="col form-group">
+            <label for="startTime">Start Time</label>
+            <input
+              type="text"
+              class="form-control"
+              id="startTime"
+              aria-describedby="startTimeHelp"
+              name="startTime"
+              placeholder="Enter Start Time"
+              required
+            />
+            <div class="invalid-feedback">
+              Make sure you select a start time that is in the future and before
+              the end time!
+            </div>
+            <script>
+              $(function() {
+                $('input[name="startTime"]').daterangepicker({
+                  timePicker: true,
+                  singleDatePicker: true,
+                  startDate: moment()
+                    .startOf("hour")
+                    .add(1, "h"),
+                  locale: {
+                    format: "ddd, MMM D, YYYY h:mm A"
+                  }
+                });
+              });
+            </script>
+          </div>
+          <div class="col form-group">
+            <label for="endTime">End Time</label>
+            <input
+              type="text"
+              class="form-control"
+              id="endTime"
+              aria-describedby="endTimeHelp"
+              name="endTime"
+              placeholder="Enter End Time"
+              required
+            />
+            <script>
+              $(function() {
+                $('input[name="endTime"]').daterangepicker({
+                  timePicker: true,
+                  singleDatePicker: true,
+                  startDate: moment()
+                    .startOf("hour")
+                    .add(2, "h"),
+                  locale: {
+                    format: "ddd, MMM D, YYYY h:mm A"
+                  }
+                });
+              });
+            </script>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Availability</button>
+      </form>
+    </div>
+  </body>
+</html>
