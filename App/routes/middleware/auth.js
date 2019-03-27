@@ -9,6 +9,7 @@ function checkLoggedIn(req, res, next) {
   }
   req.flash("warning", "You must be logged in to access that page!");
   res.redirect("/account/login");
+  return false;
 }
 
 // Function for checking if user is already logged in
@@ -18,51 +19,43 @@ function checkLoggedOut(req, res, next) {
   }
   req.flash("info", "You are already logged in!");
   res.redirect("/");
+  return false;
 }
 
 // Function for checking that the user type account is created
 function checkUserLoggedIn(req, res, next) {
-  checkLoggedIn(req, res, nullFunction);
-  pool.query("select 1 from users where id=$1", [req.user.id], function(
-    err,
-    data
-  ) {
-    if (!err && data.rowCount !== 0) {
+  if (checkLoggedIn(req, res, nullFunction) !== false) {
+    if (req.user.isuser) {
       return next();
+    } else {
+      req.flash("warning", "You cannot access that page!");
+      res.redirect("/");
     }
-    req.flash("warning", "You cannot access that page!");
-    res.redirect("/");
-  });
+  }
 }
 
 // Function for checking that the worker type account is created
 function checkWorkerLoggedIn(req, res, next) {
-  checkLoggedIn(req, res, nullFunction);
-  pool.query("select 1 from workers where id=$1", [req.user.id], function(
-    err,
-    data
-  ) {
-    if (!err && data.rowCount !== 0) {
+  if (checkLoggedIn(req, res, nullFunction) !== false) {
+    if (req.user.isworker) {
       return next();
+    } else {
+      req.flash("warning", "You cannot access that page!");
+      res.redirect("/");
     }
-    req.flash("warning", "You cannot access that page!");
-    res.redirect("/");
-  });
+  }
 }
 
 // Function for checking that the admin type account is created
 function checkAdminLoggedIn(req, res, next) {
-  checkLoggedIn(req, res, nullFunction);
-  pool.query("select 1 from admins where id=$1", [req.user.id], function(
-    err,
-    data
-  ) {
-    if (!err && data.rowCount !== 0) {
+  if (checkLoggedIn(req, res, nullFunction) !== false) {
+    if (req.user.isadmin) {
       return next();
+    } else {
+      req.flash("warning", "You cannot access that page!");
+      res.redirect("/");
     }
-    req.flash("warning", "You cannot access that page!");
-    res.redirect("/");
-  });
+  }
 }
 
 module.exports.checkLoggedIn = checkLoggedIn;
