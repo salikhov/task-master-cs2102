@@ -70,3 +70,53 @@ create constraint trigger trig_check_at_least_one_account_type
 after insert or update on accounts
 deferrable
 for each row execute procedure check_at_least_one_account_type();
+
+/* ===============================================
+ * FUNCTIONs and TRIGGERs to enforce that worker
+ * does not have overlapping availabilities
+ * a.k.a. implementing malloc but with time ranges
+ * instead of memory blocks and in SQL
+ * =============================================== */
+create or replace function check_overlaps()
+returns trigger as $$
+declare temprow record;
+begin
+  for temprow in select starttime, endtime from availability where workerid=new.workerid
+	and (overlaps(starttime, endtime, new.starttime, new.endtime)
+	or new.endtime=starttime or new.starttime=endtime)
+	and new.starttime <> starttime and new.endtime <> endtime
+  loop
+  	raise notice 'OVERLAP S: %, E: %', temprow.starttime, temprow.endtime;
+  	if temprow.starttime >= new.starttime and temprow.endtime <= new.endtime then
+  		-- if the conflict is fully encompassed by the new range then delete the conflict
+  		delete from availability where workerid=new.workerid and starttime=temprow.starttime and endtime=temprow.endtime;
+  	elsif temprow.starttime < new.starttime and temprow.endtime > new.endtime then
+  		-- if the conflict fully encompasses the new range then ignore the new range
+  		-- can immediately return since there should be no other conflicts
+  		return null;
+  	elsif temprow.starttime <= new.starttime and temprow.endtime <= new.endtime then
+  		delete from availability where workerid=new.workerid and starttime=temprow.starttime and endtime=temprow.endtime;
+  		insert into availability (workerid, starttime, endtime) values (new.workerid, temprow.starttime, new.endtime);
+		return null;
+  	elsif temprow.endtime >= new.endtime and temprow.starttime <= new.endtime then
+  		new.endtime = temprow.endtime;
+  		delete from availability where workerid=new.workerid and starttime=temprow.starttime and endtime=temprow.endtime;
+  	end if;
+  end loop;
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists trig_check_availability_overlap on availability;
+drop trigger if exists trig_check_availability_overlap_upd on availability;
+
+create trigger trig_check_availability_overlap
+before insert on availability
+for each row
+execute procedure check_overlaps();
+
+create trigger trig_check_availability_overlap_upd
+before update on availability
+for each row
+when (new.starttime < old.starttime or new.endtime > old.endtime)
+execute procedure check_overlaps();
