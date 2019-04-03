@@ -61,12 +61,26 @@ function checkAvailPermissions(req, res, next) {
 
 /* GET index - Worker Panel Summary Page */
 router.get("/", checkWorkerLoggedIn, function(req, res, next) {
-  res.render("worker/index", {
-    title: "Worker Panel",
-    navCat: "worker",
-    wNavCat: "index",
-    loggedIn: req.user
-  });
+  pool.query(
+    "select bookingid, starttime, endtime, firstname, lastname, S.name from bookingdetails B" +
+      " join accounts A on B.userid = A.id join services S on B.serviceid = S.serviceid" +
+      " where B.workerid=$1 and endtime >= NOW() order by starttime ASC limit 5",
+    [req.user.id],
+    function(err, data) {
+      if (err) {
+        genericError(req, res, "/worker");
+        return;
+      }
+      res.render("worker/index", {
+        title: "Worker Panel",
+        navCat: "worker",
+        wNavCat: "index",
+        bookings: data.rows,
+        moment: moment,
+        loggedIn: req.user
+      });
+    }
+  );
 });
 
 /* GET bookings - Worker Panel Bookings Page */
@@ -78,7 +92,6 @@ router.get("/bookings", checkWorkerLoggedIn, function(req, res, next) {
     [req.user.id],
     function(err, data) {
       if (err) {
-        console.log(err);
         genericError(req, res, "/worker");
         return;
       }
