@@ -3,6 +3,7 @@
   <head>
     <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
     <%- include ../_partials/head.ejs %>
+    <script src="/js/registerValidation.js"></script>
   </head>
   <body>
     <div class="container">
@@ -25,138 +26,142 @@
             />
           </div>
           <div class="col form-group">
-              <label for="lastName">Last Name</label>
-              <input
-                type="text"
-                class="form-control"
-                id="lastName"
-                name="lastName"
-                value="<%=loggedIn.lastname%>"
-              />
+            <label for="lastName">Last Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="lastName"
+              name="lastName"
+              value="<%=loggedIn.lastname%>"
+            />
           </div>
         </div>
         <div class="form-row">
-            <div class="col form-group">
-              <label for="email">Email</label>
+          <div class="col form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              placeholder="Email"
+              value="<%=loggedIn.email%>"
+              required
+              disabled
+            />
+          </div>
+          <div class="col form-group">
+            <label>Account Type</label><br />
+            <div class="form-check form-check-inline">
+              <!-- prettier-ignore -->
               <input
-                type="email"
-                class="form-control"
-                id="email"
-                name="email"
-                placeholder="Email"
-                value="<%=loggedIn.email%>"
-                required disabled
-              />
+                class="form-check-input"
+                type="checkbox"
+                id="userCheck"
+                name="userCheck"
+                <% if (loggedIn.isuser) { %>checked<% } %> />
+              <label class="form-check-label" for="userCheck">User</label>
             </div>
-            <div class="col form-group">
-              <label>Account Type</label><br />
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="userCheck"
-                  name="userCheck"
-                  <% if (loggedIn.isuser) {%>
-                  checked
-                  <% } %>
-                />
-                <label class="form-check-label" for="userCheck">User</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="workerCheck"
-                  name="workerCheck"
-                  <% if (loggedIn.isworker) {%>
-                    checked
-                    <% } %>
-                />
-                <label class="form-check-label" for="workerCheck">Worker</label>
+            <div class="form-check form-check-inline">
+              <!-- prettier-ignore -->
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="workerCheck"
+                name="workerCheck"
+                <% if (loggedIn.isworker) { %>checked<% } %> />
+              <label class="form-check-label" for="workerCheck">Worker</label>
+              <div class="invalid-feedback">
+                &nbsp;&nbsp;&nbsp;&nbsp;You must select at least one account
+                type!
               </div>
             </div>
           </div>
+        </div>
         <div class="form-row">
           <div class="col form-group">
-              <label for="password">Password</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  id="password"
-                  name="password"
-                />
+            <label for="password">New Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+            />
+            <small id="passHelp" class="form-text text-muted">To leave your password unchanged, leave both fields blank</small>
           </div>
           <div class="invalid-feedback">
             Make sure you type the same password in both fields!
           </div>
           <div class="col form-group">
-              <label for="confirm">Password Confirmation</label>
-              <input
-                type="password"
-                class="form-control"
-                id="password"
-                name="password"
-              />
+            <label for="confirm">New Password Confirmation</label>
+            <input
+              type="password"
+              class="form-control"
+              id="confirm"
+              name="confirm"
+            />
           </div>
         </div>
         <button type="submit" class="btn btn-primary">Save Changes</button>
       </form>
 
       <% if (loggedIn.isuser) {%>
-        <form
-          action="update2"
-          method="post"
-          onsubmit="return validateSubmit(event.target);"
-        >
-          <h1> User Details </h1>
-          <div class="form-row">
-            <div class="col form-group">
-              <label for="phone">Phone</label>
-              <input
-                type="text"
-                class="form-control"
-                id="phone"
-                name="phone"
-                value="<%=userData[0].phone%>"
-              />
-            </div>
-            <div class="col form-group">
-                <label for="address">Address</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="address"
-                  name="address"
-                  value="<%=userData[0].address%>"
-                />
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-          </form>
-        <% } %>
+      <form
+        action="update2"
+        method="post"
+        onsubmit="return validateSubmit(event.target);"
+      >
+        <hr />
+        <h1>User Details</h1>
+        <div class="form-row">
+          <div class="col form-group">
+            <label for="phone">Phone</label>
+            <input
+              type="text"
+              class="form-control"
+              id="phone"
+              name="phone"
+              value="<%=userData[0].phone%>"
+            />
+          </div>
+          <div class="col form-group">
+            <label for="address">Address</label>
+            <input
+              type="text"
+              class="form-control"
+              id="address"
+              name="address"
+              value="<%=userData[0].address%>"
+            />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </form>
+      <% } %>
 
-        <form
-          action="update3"
-          method="post"
-          onsubmit="return validateSubmit(event.target);"
-        >
-            <% if (loggedIn.isworker) {%>
-              <h1> Worker Details </h1>
-              <div class="form-row">
-                  <div class="col form-group">
-                    <label for="phone">Phone</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="phone"
-                      name="phone"
-                      value="<%=workerData[0].phone%>"
-                    />
-                  </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Save Changes</button>  
-              <% } %>
-        </form>
+      <form
+        action="update3"
+        method="post"
+        onsubmit="return validateSubmit(event.target);"
+      >
+        <% if (loggedIn.isworker) {%>
+        <hr/>
+        <h1>Worker Details</h1>
+        <div class="form-row">
+          <div class="col form-group">
+            <label for="phone">Phone</label>
+            <input
+              type="text"
+              class="form-control"
+              id="phone"
+              name="phone"
+              value="<%=workerData[0].phone%>"
+            />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <% } %>
+      </form>
     </div>
   </body>
 </html>

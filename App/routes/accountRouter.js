@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require("passport");
 const pool = require("../db");
 const account = require("../db/account");
+const { genericError } = require("../db/util");
 
 const {
   checkLoggedIn,
@@ -184,6 +185,10 @@ router.get("/", checkLoggedIn, function(req, res, next) {
       "as t3 join workers as t4 on (t3.theworkerid = t4.id) where userId = $1 ORDER by bookingid, price, starttime",
     [req.user.id],
     function(err, data) {
+      if (err) {
+        genericError(req, res);
+        return;
+      }
       res.render("account/index", {
         title: "Account",
         navCat: "account_view",
@@ -200,10 +205,18 @@ router.get("/edit", checkLoggedIn, function(req, res, next) {
     "select phone, address from users where id=$1",
     [req.user.id],
     function(err, userData) {
+      if (err) {
+        genericError(req, res);
+        return;
+      }
       pool.query(
         "select phone from workers where id=$1",
         [req.user.id],
         function(err, workerData) {
+          if (err) {
+            genericError(req, res);
+            return;
+          }
           res.render("account/edit", {
             title: "Edit Account",
             navCat: "account_edit",
@@ -219,14 +232,14 @@ router.get("/edit", checkLoggedIn, function(req, res, next) {
 
 /* POST update - Edit account action */
 router.post("/update1", checkLoggedIn, function(req, res, next) {
-  /* if (req.body.password !== req.body.confirm) {
+  if (req.body.password != "" && req.body.password !== req.body.confirm) {
     req.flash(
       "warning",
       "Make sure you type the same password in both fields!"
     );
     res.redirect("/account/edit");
     return;
-  } */
+  }
   if (!(req.body.userCheck || req.body.workerCheck) && !req.user.isadmin) {
     req.flash("warning", "You must select at least one account type!");
     res.redirect("/account/edit");
@@ -236,7 +249,37 @@ router.post("/update1", checkLoggedIn, function(req, res, next) {
     "update accounts set firstName=$1, lastName=$2 where id=$3",
     [req.body.firstName, req.body.lastName, req.user.id],
     function(err, updateData) {
-      res.redirect("/account");
+      if (err) {
+        req.flash(
+          "danger",
+          "Something went wrong during the update." + (req.body.password != "")
+            ? " Your password was not changed."
+            : ""
+        );
+        return;
+      }
+      if (req.body.password != "") {
+        const salt = account.generateSalt();
+        const hash = account.getPasswordHash(salt, req.body.password);
+        pool.query(
+          "update accounts set salt=$1, hash=$2 where id=$3",
+          [salt, hash, req.user.id],
+          function(err, updateData) {
+            if (err) {
+              req.flash(
+                "danger",
+                "Something went wrong during the update. Your password was not changed."
+              );
+              return;
+            }
+            req.flash("success", "Account information and password updated");
+            res.redirect("/account/edit");
+          }
+        );
+      } else {
+        req.flash("success", "Account information updated");
+        res.redirect("/account/edit");
+      }
     }
   );
 });
