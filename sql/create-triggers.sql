@@ -52,19 +52,43 @@ $$ language plpgsql;
 drop trigger if exists trig_check_others_exist on users;
 drop trigger if exists trig_check_others_exist on workers;
 drop trigger if exists trig_check_others_exist on admins;
+drop trigger if exists trig_check_others_exist_delete on users;
+drop trigger if exists trig_check_others_exist_delete on workers;
+drop trigger if exists trig_check_others_exist_delete on admins;
 drop trigger if exists trig_check_at_least_one_account_type on accounts;
 
 create trigger trig_check_others_exist
-before update or delete on users
-for each row execute procedure check_others_exist();
+before update on users
+for each row 
+when (NEW.id <> OLD.id)
+execute procedure check_others_exist();
 
 create trigger trig_check_others_exist
-before update or delete on workers
-for each row execute procedure check_others_exist();
+before update on workers
+for each row 
+when (NEW.id <> OLD.id)
+execute procedure check_others_exist();
 
 create trigger trig_check_others_exist
-before update or delete on admins
-for each row execute procedure check_others_exist();
+before update on admins
+for each row 
+when (NEW.id <> OLD.id)
+execute procedure check_others_exist();
+
+create trigger trig_check_others_exist_delete
+before delete on users
+for each row 
+execute procedure check_others_exist();
+
+create trigger trig_check_others_exist_delete
+before delete on workers
+for each row 
+execute procedure check_others_exist();
+
+create trigger trig_check_others_exist_delete
+before delete on admins
+for each row 
+execute procedure check_others_exist();
 
 create constraint trigger trig_check_at_least_one_account_type
 after insert or update on accounts
