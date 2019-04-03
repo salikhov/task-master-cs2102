@@ -124,3 +124,28 @@ before update on availability
 for each row
 when (new.starttime < old.starttime or new.endtime > old.endtime)
 execute procedure check_overlaps();
+
+/* ===============================================
+ * FUNCTIONs and TRIGGERs to enforce that worker
+ * does not have overlapping bookings
+ * =============================================== */
+create or replace function check_booking_overlaps()
+returns trigger as $$
+declare temprow record;
+begin
+  for temprow in select starttime, endtime from bookingdetails where workerid=new.workerid
+	and overlaps(starttime, endtime, new.starttime, new.endtime)
+  loop
+  	raise notice 'OVERLAP S: %, E: %', temprow.starttime, temprow.endtime;
+  	return null;
+  end loop;
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists trig_check_booking_overlap on bookingdetails;
+
+create trigger trig_check_booking_overlap
+before insert or update on bookingdetails
+for each row
+execute procedure check_booking_overlaps();
