@@ -31,16 +31,36 @@
     <li class="nav-item <% if (navCat === 'admin') { %>active<% } %>">
       <a class="nav-link" href="/admin">Admin</a>
     </li>
+    <% } %> <% if (loggedIn.isworker) { %>
+    <li class="nav-item <% if (navCat === 'worker') { %>active<% } %>">
+      <a class="nav-link" href="/worker">Worker</a>
+    </li>
     <% } %>
-    <li class="nav-item <% if (navCat === 'account') { %>active<% } %>">
-      <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Options
-        </button> 
-        <div class="dropdown-menu" aira-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" href="/account">View Profile</a>
-          <a class="dropdown-item" href="/account/edit">Edit Profile</a>
-        </div>
+    <li
+      class="nav-item dropdown <% if (navCat.indexOf('account') !== -1) { %>active<% } %>"
+    >
+      <a
+        class="nav-link dropdown-toggle"
+        href="#"
+        id="navbarDropdown"
+        role="button"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        Account
+      </a>
+      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <a
+          class="dropdown-item <% if (navCat === 'account_view') { %>active<% } %>"
+          href="/account"
+          >Account Details</a
+        >
+        <a
+          class="dropdown-item <% if (navCat === 'account_edit') { %>active<% } %>"
+          href="/account/edit"
+          >Edit Account</a
+        >
       </div>
     </li>
     <li class="nav-item">

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %> <%- include ./_partials/navtabs.ejs %>
+      <h4>Manage Availability</h4>
+      <a href="/worker/availability/new" class="btn btn-primary"
+        >Add Availability</a
+      >
+      <br /><br />
+      <% if (availability.length === 0) { %>
+      <p>
+        You have not indicated any future availability. You can add some now!
+      </p>
+      <% } else { %>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i = 0; i < availability.length; i++) { %>
+          <tr>
+            <td>
+              <%= moment(availability[i].starttime).format('llll') %>
+            </td>
+            <td>
+              <%= moment(availability[i].endtime).format('llll') %>
+            </td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a
+                  href="/worker/availability/edit/<%= moment(availability[i].starttime).unix() %>/<%= moment(availability[i].endtime).unix() %>"
+                  class="btn btn-secondary"
+                  >Edit</a
+                >
+                <a
+                  href="/worker/availability/delete/<%= moment(availability[i].starttime).unix() %>/<%= moment(availability[i].endtime).unix() %>"
+                  onclick="return confirm('Are you sure?');"
+                  class="btn btn-danger"
+                  >Delete</a
+                >
+              </div>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+  </body>
+</html>

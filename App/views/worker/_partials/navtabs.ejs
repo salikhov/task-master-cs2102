@@ -1,0 +1,32 @@
+<h1>Worker Management Panel</h1>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a
+      class="nav-link <% if (wNavCat === 'index') { %>active <% } %>"
+      href="/worker"
+      >Summary</a
+    >
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link <% if (wNavCat === 'bookings') { %>active <% } %>"
+      href="/worker/bookings"
+      >Bookings</a
+    >
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link <% if (wNavCat === 'services') { %>active <% } %>"
+      href="/worker/services"
+      >Services</a
+    >
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link <% if (wNavCat === 'availability') { %>active <% } %>"
+      href="/worker/availability"
+      >Availability</a
+    >
+  </li>
+</ul>
+<br />

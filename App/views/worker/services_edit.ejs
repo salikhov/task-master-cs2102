@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %> <%- include ./_partials/navtabs.ejs %>
+      <h4>Editing Service</h4>
+      <form action="/worker/services/update/<%= service.serviceid %>" method="post">
+        <div class="form-row">
+          <div class="col form-group">
+            <label for="sname">Service Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="sname"
+              name="sname"
+              placeholder="Service Name"
+              value="<%= service.name %>"
+              required
+            />
+          </div>
+          <div class="col form-group">
+            <label for="category">Category</label>
+            <select class="form-control" id="category" name="category" required>
+              <% for (let i = 0; i < categories.length; i++) { %>
+              <option value="<%= categories[i].catid %>" <% if (service.catid === categories[i].catid) { %> selected="selected" <% } %> ><%= categories[i].name %></option>
+              <% } %>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="col form-group">
+            <label for="region">City Region</label>
+            <select class="form-control" id="region" name="region" required>
+              <% for (let i = 0; i < regions.length; i++) { %>
+              <option value="<%= regions[i].regionid %>" <% if (service.regionid === regions[i].regionid) { %> selected="selected" <% } %> ><%= regions[i].name %></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="col form-group">
+            <label for="price">Price</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">$</div>
+              </div>
+              <input
+                type="number"
+                class="form-control"
+                id="price"
+                name="price"
+                placeholder="Price"
+                value="<%= service.price %>"
+                required
+              />
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="col form-group">
+            <label for="description">Description</label>
+            <textarea
+              class="form-control"
+              id="description"
+              name="description"
+              rows="3"
+              placeholder="Description"
+            >
+<%= service.description %></textarea
+            >
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </form>
+    </div>
+  </body>
+</html>

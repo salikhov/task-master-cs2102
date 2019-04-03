@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %> <%- include ./_partials/navtabs.ejs %>
+      <h3>Welcome, <%= loggedIn.firstname %>!</h3>
+      <h4>Your Upcoming Bookings</h4>
+      <% if (bookings.length === 0) { %>
+      <p>You do not have any future bookings!</p>
+      <% } else { %>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Customer</th>
+            <th>Start Time</th>
+            <th>Duration</th>
+            <th>Service</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i = 0; i < bookings.length; i++) { %>
+          <tr>
+            <td><%= bookings[i].firstname %> <%= bookings[i].lastname %></td>
+            <td><%= moment(bookings[i].starttime).format('llll') %></td>
+            <td>
+              <%=
+              moment(bookings[i].endtime).diff(moment(bookings[i].starttime),
+              'hours', true) %> hour(s)
+            </td>
+            <td><%= bookings[i].name %></td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a
+                  href="/booking/view/<%= bookings[i].bookingid %>"
+                  class="btn btn-secondary"
+                  >View</a
+                >
+                <a
+                  href="/worker/bookings/cancel/<%= bookings[i].bookingid %>"
+                  onclick="return confirm('Are you sure?');"
+                  class="btn btn-danger"
+                  >Cancel</a
+                >
+              </div>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+  </body>
+</html>

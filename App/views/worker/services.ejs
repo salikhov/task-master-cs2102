@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %> <%- include ./_partials/navtabs.ejs %>
+      <h4>Services Offered</h4>
+      <a href="/worker/services/new" class="btn btn-primary">New Service</a>
+      <br /><br />
+      <% if (services.length === 0) { %>
+      <p>You are not currently offering any services. Add a new one!</p>
+      <% } else { %>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>City Region</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i = 0; i < services.length; i++) { %>
+          <tr>
+            <td><%= services[i].sname %></td>
+            <td><%= services[i].cname %></td>
+            <td>$<%= services[i].price %></td>
+            <td><%= services[i].rname %></td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a
+                  href="/worker/services/edit/<%= services[i].serviceid %>"
+                  class="btn btn-secondary"
+                  >Edit</a
+                >
+                <a
+                  href="/worker/services/delete/<%= services[i].serviceid %>"
+                  onclick="return confirm('Are you sure?');"
+                  class="btn btn-danger"
+                  >Delete</a
+                >
+              </div>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+  </body>
+</html>
