@@ -5,6 +5,22 @@ const { genericError } = require("../db/util");
 const pool = require("../db");
 const moment = require("moment");
 
+function checkBookPermissions(req, res, next) {
+  pool.query(
+    "select 1 from bookingdetails where workerid=$1 and bookingid=$2",
+    [req.user.id, req.params.id],
+    function(err, data) {
+      if (!err && data && data.rowCount !== 0) {
+        return next();
+      } else {
+        req.flash("warning", "You cannot access that page!");
+        res.redirect("/");
+        return;
+      }
+    }
+  );
+}
+
 function checkServPermissions(req, res, next) {
   pool.query(
     "select 1 from services where workerid=$1 and serviceid=$2",
@@ -55,12 +71,53 @@ router.get("/", checkWorkerLoggedIn, function(req, res, next) {
 
 /* GET bookings - Worker Panel Bookings Page */
 router.get("/bookings", checkWorkerLoggedIn, function(req, res, next) {
-  res.render("worker/bookings", {
-    title: "Worker Panel",
-    navCat: "worker",
-    wNavCat: "bookings",
-    loggedIn: req.user
-  });
+  pool.query(
+    "select bookingid, starttime, endtime, firstname, lastname, S.name from bookingdetails B" +
+      " join accounts A on B.userid = A.id join services S on B.serviceid = S.serviceid" +
+      " where B.workerid=$1 and endtime >= NOW() order by starttime ASC",
+    [req.user.id],
+    function(err, data) {
+      if (err) {
+        console.log(err);
+        genericError(req, res, "/worker");
+        return;
+      }
+      res.render("worker/bookings", {
+        title: "Worker Panel",
+        navCat: "worker",
+        wNavCat: "bookings",
+        bookings: data.rows,
+        past: false,
+        moment: moment,
+        loggedIn: req.user
+      });
+    }
+  );
+});
+
+/* GET bookings - Worker Panel Bookings Page */
+router.get("/past_bookings", checkWorkerLoggedIn, function(req, res, next) {
+  pool.query(
+    "select bookingid, starttime, endtime, firstname, lastname, S.name from bookingdetails B" +
+      " join accounts A on B.userid = A.id join services S on B.serviceid = S.serviceid" +
+      " where B.workerid=$1 and endtime < NOW() order by endtime DESC",
+    [req.user.id],
+    function(err, data) {
+      if (err) {
+        genericError(req, res, "/worker");
+        return;
+      }
+      res.render("worker/bookings", {
+        title: "Worker Panel",
+        navCat: "worker",
+        wNavCat: "bookings",
+        bookings: data.rows,
+        past: true,
+        moment: moment,
+        loggedIn: req.user
+      });
+    }
+  );
 });
 
 /* GET bookings - Worker Panel Services Page */
@@ -111,6 +168,26 @@ router.get("/availability", checkWorkerLoggedIn, function(req, res, next) {
 /* =====================================
    ========= BOOKINGS ACTIONS ==========
    ===================================== */
+router.get(
+  "/bookings/cancel/:id",
+  checkWorkerLoggedIn,
+  checkBookPermissions,
+  function(req, res, next) {
+    pool.query(
+      "delete from billingdetails C using bookingdetails B" +
+        " where B.billingid = C.billingid and B.bookingid = $1",
+      [req.params.id],
+      function(err, data) {
+        if (err) {
+          genericError(req, res, "/worker/bookings");
+          return;
+        }
+        req.flash("success", "Booking cancelled");
+        res.redirect("/worker/bookings");
+      }
+    );
+  }
+);
 
 /* =====================================
    ========= SERVICES ACTIONS ==========

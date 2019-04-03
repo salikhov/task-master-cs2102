@@ -92,7 +92,7 @@ create table discounts (
 );
 
 create table billingdetails (
-  billingId   serial       primary key,
+  billingId   serial        primary key,
   cardNumber  varchar(16)   not null,
   expDate     varchar(5)    not null,
   cvv         varchar(4)    not null,
@@ -100,12 +100,12 @@ create table billingdetails (
 );
 
 create table bookingdetails (
-  bookingId   serial       primary key,
-  startTime   text     not null,
-  endTime     text     not null,
+  bookingId   serial        primary key,
+  startTime   timestamp     not null,
+  endTime     timestamp     not null,
   address     text          not null,
   comments    text          not null default 'N/A',
-  billingId   integer       not null references billingdetails(billingId),
+  billingId   integer       unique not null references billingdetails(billingId) on delete cascade,
   userId      integer       not null references users(id),
   workerId    integer       not null references workers(id),
   serviceId   integer       not null references services(serviceId)

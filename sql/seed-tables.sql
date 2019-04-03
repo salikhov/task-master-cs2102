@@ -199,3 +199,27 @@ insert into approves (workerId, approved, adminId) values (37, false, null);
 insert into approves (workerId, approved, adminId) values (38, false, null);
 insert into approves (workerId, approved, adminId) values (39, true, 41);
 insert into approves (workerId, approved, adminId) values (40, true, 41);
+
+/**********************************************
+***********************************************
+=================== BILLING ===================
+***********************************************
+**********************************************/
+insert into billingdetails (cardnumber, expdate, cvv) values ('3561686194236825', '26/99', '985');
+insert into billingdetails (cardnumber, expdate, cvv) values ('6759650688272741', '06/63', '581');
+insert into billingdetails (cardnumber, expdate, cvv) values ('3531263062654112', '17/09', '791');
+insert into billingdetails (cardnumber, expdate, cvv) values ('5459595095872945', '84/15', '040');
+insert into billingdetails (cardnumber, expdate, cvv) values ('6709259575774222', '47/91', '698');
+insert into billingdetails (cardnumber, expdate, cvv) values ('6333975306849681', '37/09', '085');
+insert into billingdetails (cardnumber, expdate, cvv) values ('3580417032653329', '01/53', '403');
+insert into billingdetails (cardnumber, expdate, cvv) values ('3570249476536344', '87/85', '222');
+insert into billingdetails (cardnumber, expdate, cvv) values ('5602240655319070', '47/83', '121');
+insert into billingdetails (cardnumber, expdate, cvv) values ('5893801912974359', '97/53', '013');
+
+/**********************************************
+***********************************************
+=================== BOOKINGS ==================
+***********************************************
+**********************************************/
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid) values ('2019-05-05 15:00', '2019-05-05 17:30', '49645 Golf Court', 2, 2, 29, 6);
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid) values ('2019-03-05 15:00', '2019-03-05 17:30', '49645 Golf Court', 3, 2, 29, 6);
