@@ -30,9 +30,9 @@ create table users (
 );
 
 create table refers (
-  referrerId  integer       not null references users(id),
-  userId      integer       unique not null references users(id),
-  primary key(referrerId, userId)
+  referrerId  integer       not null references accounts(id),
+  email       varchar(254)  unique not null,
+  primary key(referrerId, email)
 );
 
 create table workers (
@@ -86,7 +86,7 @@ create table availability (
 
 create table discounts (
   discountId  serial       primary key,
-  promoCode   varchar(10)   not null unique,
+  promoCode   varchar(12)  not null unique,
   amount      numeric, -- we need to add constraints so one of
   percent     numeric  -- these two must be null
 );
@@ -96,7 +96,7 @@ create table billingdetails (
   cardNumber  varchar(16)   not null,
   expDate     varchar(5)    not null,
   cvv         varchar(4)    not null,
-  discountId  integer       references discounts(discountId)
+  discountId  integer       unique references discounts(discountId)
 );
 
 create table bookingdetails (

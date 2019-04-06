@@ -118,17 +118,6 @@ insert into admins (id) values (45);
 
 /**********************************************
 ***********************************************
-=================== REFERRAL ==================
-***********************************************
-**********************************************/
-insert into refers (referrerId, userId) values (10, 7);
-insert into refers (referrerId, userId) values (18, 1);
-insert into refers (referrerId, userId) values (19, 2);
-insert into refers (referrerId, userId) values (20, 8);
-insert into refers (referrerId, userId) values (14, 4);
-
-/**********************************************
-***********************************************
 ================== CATEGORIES =================
 ***********************************************
 **********************************************/
