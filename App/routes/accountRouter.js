@@ -230,6 +230,86 @@ router.get("/edit", checkLoggedIn, function(req, res, next) {
   );
 });
 
+/* POST update - Update account type */
+router.post("/update_type", checkLoggedIn, function(req, res, next) {
+  console.log(req.body);
+  if (!(req.body.userCheck || req.body.workerCheck) && !req.user.isadmin) {
+    req.flash("warning", "You must select at least one account type!");
+    res.redirect("/account/edit");
+    return;
+  }
+  if (
+    (req.user.isuser && req.body.userCheck == undefined) ||
+    (req.user.isworker && req.body.workerCheck == undefined)
+  ) {
+    req.flash(
+      "warning",
+      "You cannot disable account types your account already belongs to!"
+    );
+    res.redirect("/account/edit");
+    return;
+  }
+  pool.connect(function(err, client, done) {
+    function abort(err) {
+      if (err) {
+        client.query("rollback", function(err) {
+          done();
+        });
+        req.flash(
+          "danger",
+          "Something went wrong while updating your account type"
+        );
+        res.redirect("/account/edit");
+        return true;
+      }
+      return false;
+    }
+    client.query("begin; set constraints all deferred;", function(err, res1) {
+      if (abort(err)) return;
+      let failed = false;
+      if (!req.user.isuser && req.body.userCheck) {
+        client.query(
+          "insert into users (id) values ($1)",
+          [req.user.id],
+          function(err, res2) {
+            if (abort(err)) {
+              failed = true;
+              return;
+            }
+          }
+        );
+      }
+      if (!req.user.isworker && req.body.workerCheck) {
+        client.query(
+          "insert into workers (id) values ($1)",
+          [req.user.id],
+          function(err, res3) {
+            if (abort(err)) {
+              failed = true;
+              return;
+            }
+          }
+        );
+      }
+      if (!failed) {
+        client.query("commit", function(err, res5) {
+          if (abort(err)) return;
+          done();
+          req.flash("success", "Update account type");
+          res.redirect("/account/edit");
+        });
+      } else {
+        done();
+        req.flash(
+          "danger",
+          "Something went wrong while updating your account type"
+        );
+        res.redirect("/account/edit");
+      }
+    });
+  });
+});
+
 /* POST update - Edit account action */
 router.post("/update1", checkLoggedIn, function(req, res, next) {
   if (req.body.password != "" && req.body.password !== req.body.confirm) {
@@ -240,8 +320,26 @@ router.post("/update1", checkLoggedIn, function(req, res, next) {
     res.redirect("/account/edit");
     return;
   }
+  const userChanged =
+    (req.user.isuser && !req.body.userCheck) ||
+    (req.body.userCheck && !req.user.isuser);
+  const workerChanged =
+    (req.user.isworker && !req.body.workerCheck) ||
+    (req.body.workerCheck && !req.user.isworker);
+  console.log(req.body);
   if (!(req.body.userCheck || req.body.workerCheck) && !req.user.isadmin) {
     req.flash("warning", "You must select at least one account type!");
+    res.redirect("/account/edit");
+    return;
+  }
+  if (
+    (req.user.isuser && req.body.userCheck == undefined) ||
+    (req.user.isworker && req.body.workerCheck == undefined)
+  ) {
+    req.flash(
+      "warning",
+      "You cannot disable account types your account already belongs to!"
+    );
     res.redirect("/account/edit");
     return;
   }
@@ -273,12 +371,20 @@ router.post("/update1", checkLoggedIn, function(req, res, next) {
               return;
             }
             req.flash("success", "Account information and password updated");
-            res.redirect("/account/edit");
+            if (userChanged || workerChanged) {
+              res.redirect(307, "/account/update_type");
+            } else {
+              res.redirect("/account/edit");
+            }
           }
         );
       } else {
         req.flash("success", "Account information updated");
-        res.redirect("/account/edit");
+        if (userChanged || workerChanged) {
+          res.redirect(307, "/account/update_type");
+        } else {
+          res.redirect("/account/edit");
+        }
       }
     }
   );

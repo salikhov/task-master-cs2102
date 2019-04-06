@@ -59,7 +59,10 @@
                 type="checkbox"
                 id="userCheck"
                 name="userCheck"
-                <% if (loggedIn.isuser) { %>checked<% } %> />
+                <% if (loggedIn.isuser) { %>checked disabled<% } %> />
+                <% if (loggedIn.isuser) { %>
+                  <input type="hidden" name="userCheck" value="true" />
+                <% } %>
               <label class="form-check-label" for="userCheck">User</label>
             </div>
             <div class="form-check form-check-inline">
@@ -69,13 +72,17 @@
                 type="checkbox"
                 id="workerCheck"
                 name="workerCheck"
-                <% if (loggedIn.isworker) { %>checked<% } %> />
+                <% if (loggedIn.isworker) { %>checked disabled<% } %> />
+              <% if (loggedIn.isworker) { %>
+              <input type="hidden" name="workerCheck" value="true" />
+              <% } %>
               <label class="form-check-label" for="workerCheck">Worker</label>
               <div class="invalid-feedback">
                 &nbsp;&nbsp;&nbsp;&nbsp;You must select at least one account
                 type!
               </div>
             </div>
+            <small id="checkHelp" class="form-text text-muted">You cannot disable account types your account already belongs to</small>
           </div>
         </div>
         <div class="form-row">
