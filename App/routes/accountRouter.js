@@ -326,7 +326,6 @@ router.post("/update1", checkLoggedIn, function(req, res, next) {
   const workerChanged =
     (req.user.isworker && !req.body.workerCheck) ||
     (req.body.workerCheck && !req.user.isworker);
-  console.log(req.body);
   if (!(req.body.userCheck || req.body.workerCheck) && !req.user.isadmin) {
     req.flash("warning", "You must select at least one account type!");
     res.redirect("/account/edit");
@@ -392,12 +391,15 @@ router.post("/update1", checkLoggedIn, function(req, res, next) {
 
 /* POST update - Edit user action */
 router.post("/update2", checkLoggedIn, function(req, res, next) {
-  console.log(req.body);
   pool.query(
     "update users set phone=$1, address=$2 where id=$3",
-    [req.body.phone, req.body.address, req.user.id],
+    [req.body.userPhone, req.body.address, req.user.id],
     function(err, updateData) {
-      res.redirect("/account");
+      if (err) {
+        genericError(req, res, "/account/edit");
+      }
+      req.flash("success", "User details updated");
+      res.redirect("/account/edit");
     }
   );
 });
@@ -406,9 +408,13 @@ router.post("/update2", checkLoggedIn, function(req, res, next) {
 router.post("/update3", checkLoggedIn, function(req, res, next) {
   pool.query(
     "update workers set phone=$1 where id=$2",
-    [req.body.phone, req.user.id],
+    [req.body.workerPhone, req.user.id],
     function(err, updateData) {
-      res.redirect("/account");
+      if (err) {
+        genericError(req, res, "/account/edit");
+      }
+      req.flash("success", "Worker details updated");
+      res.redirect("/account/edit");
     }
   );
 });

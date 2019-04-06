@@ -116,7 +116,6 @@
       <form
         action="update2"
         method="post"
-        onsubmit="return validateSubmit(event.target);"
       >
         <hr />
         <h1>User Details</h1>
@@ -127,7 +126,7 @@
               type="text"
               class="form-control"
               id="phone"
-              name="phone"
+              name="userPhone"
               value="<%=userData[0].phone%>"
             />
           </div>
@@ -149,7 +148,6 @@
       <form
         action="update3"
         method="post"
-        onsubmit="return validateSubmit(event.target);"
       >
         <% if (loggedIn.isworker) {%>
         <hr/>
@@ -161,7 +159,7 @@
               type="text"
               class="form-control"
               id="phone"
-              name="phone"
+              name="workerPhone"
               value="<%=workerData[0].phone%>"
             />
           </div>
