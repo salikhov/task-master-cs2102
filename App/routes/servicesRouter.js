@@ -13,8 +13,7 @@ router.get("/", function(req, res, next) {
     "where exists (select 1 from availability A where A.workerid = S.workerid and A.starttime > NOW())";
   const params = [];
   if (req.query.q) {
-    query += " and (S.name ILIKE $1 or S.description ILIKE $2)";
-    params.push("%" + req.query.q + "%");
+    query += " and (S.name ILIKE $1 or S.description ILIKE $1)";
     params.push("%" + req.query.q + "%");
   }
   if (req.query.p) {
