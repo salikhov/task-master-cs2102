@@ -68,7 +68,7 @@ router.get("/", checkWorkerLoggedIn, function(req, res, next) {
     [req.user.id],
     function(err, data) {
       if (err) {
-        genericError(req, res, "/worker");
+        genericError(req, res, "/");
         return;
       }
       res.render("worker/index", {
