@@ -45,20 +45,20 @@ create table admins (
 );
 
 create table categories (
-  catId       serial       primary key,
-  name        varchar(40)   not null
+  catId       serial        primary key,
+  name        varchar(40)   not null unique
 );
 
 create table cityregions (
-  regionId    serial       primary key,
-  name        varchar(40)   not null
+  regionId    serial        primary key,
+  name        varchar(40)   not null unique
 );
 
 create table services (
-  serviceId   serial       primary key,
+  serviceId   serial        primary key,
   name        varchar(40)   not null,
   description text          not null default 'N/A',
-  price       numeric       not null,
+  price       numeric       not null check (price > 0),
   workerId    integer       not null references workers(id),
   catId       integer       not null references categories(catId),
   regionId    integer       not null references cityregions(regionId)
@@ -85,10 +85,10 @@ create table availability (
 );
 
 create table discounts (
-  discountId  serial       primary key,
-  promoCode   varchar(12)  not null unique,
-  amount      numeric, -- we need to add constraints so one of
-  percent     numeric  -- these two must be null
+  discountId  serial        primary key,
+  promoCode   varchar(12)   not null unique,
+  amount      numeric       check (amount > 0),
+  percent     numeric       check (percent > 0 and percent < 100)
 );
 
 create table billingdetails (
@@ -97,6 +97,12 @@ create table billingdetails (
   expDate     varchar(5)    not null,
   cvv         varchar(4)    not null,
   discountId  integer       unique references discounts(discountId)
+);
+
+create table reviews (
+  reviewId    serial        primary key,
+  rating      integer       not null check (rating >= 1 and rating <= 5),
+  review      text
 );
 
 create table bookingdetails (
@@ -108,13 +114,6 @@ create table bookingdetails (
   billingId   integer       unique not null references billingdetails(billingId) on delete cascade,
   userId      integer       not null references users(id),
   workerId    integer       not null references workers(id),
-  serviceId   integer       not null references services(serviceId)
-);
-
-create table reviews (
-  userId      integer       not null references users(id),
-  workerId    integer       not null references workers(id),
-  bookingId   integer       unique not null references bookingdetails(bookingId),
-  rating      integer       not null,
-  review      text
+  serviceId   integer       not null references services(serviceId),
+  reviewId    integer       references reviews(reviewId)
 );
