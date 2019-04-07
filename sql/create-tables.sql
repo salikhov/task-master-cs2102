@@ -115,5 +115,5 @@ create table bookingdetails (
   userId      integer       not null references users(id),
   workerId    integer       not null references workers(id),
   serviceId   integer       not null references services(serviceId),
-  reviewId    integer       references reviews(reviewId)
+  reviewId    integer       unique references reviews(reviewId)
 );

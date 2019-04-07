@@ -158,7 +158,7 @@ returns trigger as $$
 declare temprow record;
 begin
   for temprow in select starttime, endtime from bookingdetails where workerid=new.workerid
-	and overlaps(starttime, endtime, new.starttime, new.endtime)
+	and overlaps(starttime, endtime, new.starttime, new.endtime) and bookingid <> new.bookingid
   loop
   	raise notice 'OVERLAP S: %, E: %', temprow.starttime, temprow.endtime;
   	return null;

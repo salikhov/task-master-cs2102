@@ -30,7 +30,7 @@
           </div>
           <div class="col">
             <select class="form-control" name="c">
-              <option value="" <% if (query.c === "") { %>selected <% } %>>--- Select Category ---</option>
+              <option value="" <% if (query.c === "") { %>selected <% } %>>Any Category</option>
               <% for (let i = 0; i < categories.length; i++) { %>
               <option value="<%= categories[i].catid %>"
                   <% if (query.c == categories[i].catid) { %>selected<% } %>
@@ -41,7 +41,7 @@
           </div>
           <div class="col">
             <select class="form-control" name="r">
-              <option value="" <% if (query.r === "") { %>selected<% } %>>--- Select Region ---</option>
+              <option value="" <% if (query.r === "") { %>selected<% } %>>Any Region</option>
               <% for (let i = 0; i < regions.length; i++) { %>
               <option value="<%= regions[i].regionid %>"
                 <% if (query.r == regions[i].regionid) { %>selected<% } %>
@@ -50,10 +50,21 @@
               <% } %>
             </select>
           </div>
+          <div class="col">
+            <select class="form-control" name="s">
+              <option value="" <% if (query.s === "") { %>selected<% } %>>Any Rating</option>
+              <option value="2" <% if (query.s === "2") { %>selected<% } %>>&#8805;2 stars</option>
+              <option value="3" <% if (query.s === "3") { %>selected<% } %>>&#8805;3 stars</option>
+              <option value="4" <% if (query.s === "4") { %>selected<% } %>>&#8805;4 stars</option>
+            </select>
+          </div>
           <button type="submit" class="btn btn-primary">Filter Results</button>
         </div>
       </form>
       <br />
+      <% if (services.length === 0) { %>
+      <p>No services were found matching your query.</p>
+      <% } else { %>
       <table class="table">
         <thead class="thead-dark">
           <tr>
@@ -62,6 +73,7 @@
             <th>Hourly Price</th>
             <th>Category</th>
             <th>Service Area</th>
+            <th>Average Rating</th>
           </tr>
         </thead>
         <tbody>
@@ -73,10 +85,12 @@
             <td>$<%= services[i].price %></td>
             <td><%= services[i].cname %></td>
             <td><%= services[i].rname %></td>
+            <td><%= services[i].avg == null ? "No rating" : (Math.round(services[i].avg * 100) / 100) + " stars" %></td>
           </tr>
           <% } %>
         </tbody>
       </table>
+      <% } %>
     </div>
   </body>
 </html>
