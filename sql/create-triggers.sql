@@ -173,3 +173,28 @@ create trigger trig_check_booking_overlap
 before insert or update on bookingdetails
 for each row
 execute procedure check_booking_overlaps();
+
+/* ===============================================
+ * FUNCTIONs and TRIGGERs to enforce that referrer
+ cannot refer themselves
+ * =============================================== */
+create or replace function check_referrer()
+returns trigger as $$
+declare ref_email varchar(254);
+begin
+  ref_email := (select email from accounts where id=new.referrerid);
+  if ref_email = new.email then
+    raise notice 'Cannot refer yourself!';
+    return null;
+  else 
+    return new; 
+  end if;
+end;
+$$ language plpgsql;
+
+drop trigger if exists check_referrer on refers;
+
+create trigger check_referrer
+before insert or update on refers
+for each row
+execute procedure check_referrer();
