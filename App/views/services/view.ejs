@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %>
+      <h4>Service Details - <%= details.sname %></h4>
+      <table class="table">
+        <tbody>
+          <tr>
+            <td><strong>Name: </strong> <%= details.sname %></td>
+            <td><strong>Worker: </strong> <%= details.wname %></td>
+            <td><strong>Price: </strong> $<%= details.price %></td>
+          </tr>
+          <tr>
+            <td><strong>Category: </strong> <%= details.cname %></td>
+            <td><strong>Service Area: </strong> <%= details.rname %></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="3">
+              <strong>Description: </strong><br />
+              <%= details.description %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

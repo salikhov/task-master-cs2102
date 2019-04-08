@@ -67,7 +67,8 @@ create table services (
 create table approves (
   workerId    integer       primary key references workers(id),
   approved    boolean       not null default FALSE,
-  adminId     integer       references admins(id)
+  adminId     integer       references admins(id),
+  check ((approved = true and adminId is not null) or (approved = false and adminId is null))
 );
 
 create table monitors (
@@ -115,5 +116,5 @@ create table bookingdetails (
   userId      integer       not null references users(id),
   workerId    integer       not null references workers(id),
   serviceId   integer       not null references services(serviceId),
-  reviewId    integer       references reviews(reviewId)
+  reviewId    integer       unique references reviews(reviewId)
 );

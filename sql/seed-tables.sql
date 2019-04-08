@@ -168,24 +168,14 @@ insert into services (serviceId, name, price, workerId, catId, regionId) values 
 ================== APPROVES ===================
 ***********************************************
 **********************************************/
-insert into approves (workerId, approved, adminId) values (21, false, null);
-insert into approves (workerId, approved, adminId) values (22, false, null);
 insert into approves (workerId, approved, adminId) values (23, true, 41);
 insert into approves (workerId, approved, adminId) values (24, true, 41);
 insert into approves (workerId, approved, adminId) values (25, true, 41);
 insert into approves (workerId, approved, adminId) values (26, true, 41);
-insert into approves (workerId, approved, adminId) values (27, false, null);
 insert into approves (workerId, approved, adminId) values (28, true, 41);
 insert into approves (workerId, approved, adminId) values (29, true, 41);
-insert into approves (workerId, approved, adminId) values (30, false, null);
-insert into approves (workerId, approved, adminId) values (31, false, null);
 insert into approves (workerId, approved, adminId) values (32, true, 41);
 insert into approves (workerId, approved, adminId) values (33, true, 41);
-insert into approves (workerId, approved, adminId) values (34, false, null);
-insert into approves (workerId, approved, adminId) values (35, false, null);
-insert into approves (workerId, approved, adminId) values (36, false, null);
-insert into approves (workerId, approved, adminId) values (37, false, null);
-insert into approves (workerId, approved, adminId) values (38, false, null);
 insert into approves (workerId, approved, adminId) values (39, true, 41);
 insert into approves (workerId, approved, adminId) values (40, true, 41);
 

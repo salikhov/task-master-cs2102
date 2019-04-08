@@ -9,11 +9,18 @@
     <div class="container">
       <%- include ../_partials/nav.ejs %>
       <h1>Edit Profile</h1>
+      <% if (loggedIn.isadmin === true) { %>
       <form
         action="update1"
         method="post"
-        onsubmit="return validateSubmit(event.target);"
       >
+      <% } else { %>  
+      <form
+        action="update1"
+        method="post"
+        onsubmit="return validateSubmit(event.target, true);"
+      >
+      <% } %>
         <div class="form-row">
           <div class="col form-group">
             <label for="firstName">First Name</label>
@@ -94,10 +101,10 @@
               id="password"
               name="password"
             />
+            <div class="invalid-feedback">
+              Make sure you type the same password in both fields!
+            </div>
             <small id="passHelp" class="form-text text-muted">To leave your password unchanged, leave both fields blank</small>
-          </div>
-          <div class="invalid-feedback">
-            Make sure you type the same password in both fields!
           </div>
           <div class="col form-group">
             <label for="confirm">New Password Confirmation</label>

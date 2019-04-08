@@ -37,12 +37,26 @@ function checkUserLoggedIn(req, res, next) {
 // Function for checking that the worker type account is created
 function checkWorkerLoggedIn(req, res, next) {
   if (checkLoggedIn(req, res, nullFunction) !== false) {
-    if (req.user.isworker) {
-      return next();
-    } else {
-      req.flash("warning", "You cannot access that page!");
-      res.redirect("/");
-    }
+    pool.query(
+      "select 1 from approves where workerid=$1 and approved=true",
+      [req.user.id],
+      function(err, data) {
+        if (err || !req.user.isworker) {
+          req.flash("warning", "You cannot access that page!");
+          res.redirect("/");
+          return;
+        } else if (data.rowCount === 0) {
+          req.flash(
+            "warning",
+            "You cannot access that functionality until you get approved by an administrator!"
+          );
+          res.redirect("/");
+          return;
+        } else {
+          return next();
+        }
+      }
+    );
   }
 }
 

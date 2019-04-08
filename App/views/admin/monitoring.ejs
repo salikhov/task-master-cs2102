@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %> <%- include ./_partials/navtabs.ejs %>
+      <h4>Service Monitoring Management</h4>
+
+      <a href="/admin/monitoring/new" class="btn btn-primary"
+        >Monitor New Services</a
+      ><br /><br />
+      <% if (monit.length === 0) { %>
+      <p>You aren't monitoring any services right now!</p>
+      <% } else { %>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Service ID</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i = 0; i < monit.length; i++) { %>
+          <tr>
+            <td>
+              <%= monit[i].serviceid %>
+            </td>
+            <td>
+              <%= monit[i].active ? "Yes" : "No" %>
+            </td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a
+                  class="btn btn-secondary btn-sm"
+                  href="/services/view/<%= monit[i].serviceid %>"
+                  >Details</a
+                >
+                <% if (monit[i].active) { %>
+                <a
+                  class="btn btn-warning btn-sm"
+                  onclick="return confirm('Are you sure?');"
+                  href="/admin/monitoring/deactivate/<%= monit[i].serviceid %>"
+                  >Deactivate</a
+                >
+                <% } else { %>
+                <a
+                  class="btn btn-success btn-sm"
+                  onclick="return confirm('Are you sure?');"
+                  href="/admin/monitoring/activate/<%= monit[i].serviceid %>"
+                  >Activate</a
+                ><% } %>
+                <a
+                  class="btn btn-danger btn-sm"
+                  onclick="return confirm('Are you sure?');"
+                  href="/admin/monitoring/stop/<%= monit[i].serviceid %>"
+                  >Stop Monitoring</a
+                >
+              </div>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+  </body>
+</html>

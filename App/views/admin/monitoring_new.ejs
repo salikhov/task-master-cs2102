@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %> <%- include ./_partials/navtabs.ejs %>
+      <h4>Monitor New Service</h4>
+      <% if (possMonitors.length === 0) { %>
+      <p>No services available to monitor.</p>
+      <% } else { %>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Service ID</th>
+            <th>Service Name</th>
+            <th>Worker Name</th>
+            <th>Category</th>
+            <th>Region</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i = 0; i < possMonitors.length; i++) { %>
+          <tr>
+            <td>
+              <%= possMonitors[i].serviceid %>
+            </td>
+            <td>
+              <%= possMonitors[i].sname %>
+            </td>
+            <td>
+              <%= possMonitors[i].wname %>
+            </td>
+            <td>
+              <%= possMonitors[i].cname %>
+            </td>
+            <td>
+              <%= possMonitors[i].rname %>
+            </td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a
+                  class="btn btn-secondary btn-sm"
+                  href="/services/view/<%= possMonitors[i].serviceid %>"
+                  >Details</a
+                >
+                <a
+                  class="btn btn-success btn-sm"
+                  href="/admin/monitoring/create/<%= possMonitors[i].serviceid %>"
+                  >Monitor</a
+                >
+              </div>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+  </body>
+</html>
