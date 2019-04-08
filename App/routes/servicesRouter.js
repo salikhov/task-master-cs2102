@@ -12,7 +12,8 @@ router.get("/", function(req, res, next) {
     "from services S join cityregions R on R.regionid = S.regionid join categories C on C.catid = S.catid " +
     "left join bookingdetails B on B.serviceid = S.serviceid and B.endtime <= NOW()" +
     "left join reviews V on B.reviewid = V.reviewid " +
-    "where exists (select 1 from availability A where A.workerid = S.workerid and A.starttime > NOW())";
+    "where exists (select 1 from availability A where A.workerid = S.workerid and A.starttime > NOW())" +
+    "and not exists (select 1 from monitors M where M.serviceid = S.serviceid and M.active = false)";
   const params = [];
   if (req.query.q) {
     query += " and (S.name ILIKE $1 or S.description ILIKE $1)";

@@ -109,4 +109,102 @@ router.get("/monitoring", checkAdminLoggedIn, function(req, res, next) {
   });
 });
 
+router.get("/monitoring/new", checkAdminLoggedIn, function(req, res, next) {
+  const possibleMonitors = `select S.serviceid, S.name as sname, W.firstname || ' ' || W.lastname as wname, C.name as cname, CR.name as rname
+  from services S join accounts W on W.id = S.workerid join categories C on C.catid = S.catid join cityregions CR on CR.regionid = S.regionid
+  where not exists (select 1 from monitors MT where MT.serviceid=S.serviceid)`;
+  pool.query(possibleMonitors, function(err, data) {
+    if (err) {
+      genericError(req, res, "/monitors");
+      return;
+    }
+    res.render("admin/monitoring_new", {
+      title: "Admin Panel",
+      navCat: "admin",
+      aNavCat: "monit",
+      possMonitors: data.rows,
+      loggedIn: req.user
+    });
+  });
+});
+
+router.get("/monitoring/create/:id", checkAdminLoggedIn, function(
+  req,
+  res,
+  next
+) {
+  pool.query(
+    "insert into monitors (serviceid, adminid) values ($1, $2)",
+    [req.params.id, req.user.id],
+    function(err, data) {
+      if (err) {
+        genericError(req, res, "/admin/monitoring/new");
+        return;
+      }
+      req.flash("success", "Added service to your monitoring responsibility");
+      res.redirect("/admin/monitoring");
+    }
+  );
+});
+
+router.get("/monitoring/stop/:id", checkAdminLoggedIn, function(
+  req,
+  res,
+  next
+) {
+  pool.query(
+    "delete from monitors where serviceid=$1",
+    [req.params.id],
+    function(err, data) {
+      if (err) {
+        genericError(req, res, "/admin/monitoring");
+        return;
+      }
+      req.flash(
+        "success",
+        "Removed service from your monitoring responsbility"
+      );
+      res.redirect("/admin/monitoring");
+    }
+  );
+});
+
+router.get("/monitoring/activate/:id", checkAdminLoggedIn, function(
+  req,
+  res,
+  next
+) {
+  pool.query(
+    "update monitors set active=true where serviceid=$1",
+    [req.params.id],
+    function(err, data) {
+      if (err) {
+        genericError(req, res, "/admin/monitoring");
+        return;
+      }
+      req.flash("success", "Service activated");
+      res.redirect("/admin/monitoring");
+    }
+  );
+});
+
+router.get("/monitoring/deactivate/:id", checkAdminLoggedIn, function(
+  req,
+  res,
+  next
+) {
+  pool.query(
+    "update monitors set active=false where serviceid=$1",
+    [req.params.id],
+    function(err, data) {
+      if (err) {
+        genericError(req, res, "/admin/monitoring");
+        return;
+      }
+      req.flash("success", "Service deactivated");
+      res.redirect("/admin/monitoring");
+    }
+  );
+});
+
 module.exports = router;
