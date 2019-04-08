@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %> <%- include ./_partials/navtabs.ejs %>
+      <h4>Worker Approval Management</h4>
+      <h5>Need Approval</h5>
+      <% if (needApproval.length === 0) { %>
+      <p>No one needs approval right now!</p>
+      <% } else { %>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i = 0; i < needApproval.length; i++) { %>
+          <tr>
+            <td>
+              <%= needApproval[i].firstname %> <%= needApproval[i].lastname %>
+            </td>
+            <td>
+              <a
+                class="btn btn-success btn-sm"
+                href="/admin/approval/<%= needApproval[i].id %>"
+                >Approve</a
+              >
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
+      <hr />
+      <h5>Already Approved</h5>
+      <% if (approved.length === 0) { %>
+      <p>No one approved yet!</p>
+      <% } else { %>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i = 0; i < approved.length; i++) { %>
+          <tr>
+            <td>
+              <%= approved[i].firstname %> <%= approved[i].lastname %>
+            </td>
+            <td>
+              <a
+                class="btn btn-danger btn-sm"
+                onclick="return confirm('Are you sure?');"
+                href="/admin/approval/revoke/<%= approved[i].workerid %>"
+                >Revoke Approval</a
+              >
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+  </body>
+</html>

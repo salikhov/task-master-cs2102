@@ -1,0 +1,25 @@
+<h1>Administrator Panel</h1>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a
+      class="nav-link <% if (aNavCat === 'index') { %>active <% } %>"
+      href="/admin"
+      >Summary</a
+    >
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link <% if (aNavCat === 'approval') { %>active <% } %>"
+      href="/admin/approval"
+      >Approval</a
+    >
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link <% if (aNavCat === 'monit') { %>active <% } %>"
+      href="/admin/monitoring"
+      >Monitoring</a
+    >
+  </li>
+</ul>
+<br />

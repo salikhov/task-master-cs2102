@@ -67,7 +67,8 @@ create table services (
 create table approves (
   workerId    integer       primary key references workers(id),
   approved    boolean       not null default FALSE,
-  adminId     integer       references admins(id)
+  adminId     integer       references admins(id),
+  check ((approved = true and adminId is not null) or (approved = false and adminId is null))
 );
 
 create table monitors (

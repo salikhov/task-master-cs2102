@@ -181,6 +181,12 @@ router.post("/register", checkLoggedOut, function(req, res, next) {
                                   res.redirect("/account/login");
                                   return;
                                 }
+                                if (req.body.workerCheck) {
+                                  req.flash(
+                                    "info",
+                                    "Before you are able to access the worker functionality, you will need to wait to be approved by an administrator."
+                                  );
+                                }
                                 req.flash(
                                   "success",
                                   "Created account, you may now login. Your referral discount code is: " +
@@ -190,6 +196,12 @@ router.post("/register", checkLoggedOut, function(req, res, next) {
                               }
                             );
                           } else {
+                            if (req.body.workerCheck) {
+                              req.flash(
+                                "info",
+                                "Before you are able to access the worker functionality, you will need to wait to be approved by an administrator."
+                              );
+                            }
                             req.flash(
                               "success",
                               "Created account, you may now login."
