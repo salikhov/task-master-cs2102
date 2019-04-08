@@ -1,7 +1,15 @@
 function validateSubmit(formData) {
+  validateSubmit(formData, false);
+}
+
+function validateSubmit(formData, disableAccountTypeValidate) {
   const pass = validatePasswords(formData);
-  const accType = validateAccountType(formData);
-  return pass && accType;
+  if (disableAccountTypeValidate) {
+    return pass;
+  } else {
+    const accType = validateAccountType(formData);
+    return pass && accType;
+  }
 }
 
 function validateAccountType(formData) {
