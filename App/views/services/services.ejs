@@ -74,6 +74,7 @@
             <th>Category</th>
             <th>Service Area</th>
             <th>Average Rating</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -86,6 +87,11 @@
             <td><%= services[i].cname %></td>
             <td><%= services[i].rname %></td>
             <td><%= services[i].avg == null ? "No rating" : (Math.round(services[i].avg * 100) / 100) + " stars" %></td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a class="btn btn-secondary btn-sm" href="/services/view/<%= services[i].serviceid %>">Details</a>
+              </div>
+            </td>
           </tr>
           <% } %>
         </tbody>

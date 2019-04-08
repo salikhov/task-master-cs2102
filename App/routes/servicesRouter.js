@@ -3,6 +3,8 @@ const router = express.Router();
 const passport = require("passport");
 const pool = require("../db");
 
+const { genericError } = require("../db/util");
+
 /* Services homepage */
 router.get("/", function(req, res, next) {
   let query =
@@ -58,6 +60,29 @@ router.get("/", function(req, res, next) {
           loggedIn: req.user
         });
       });
+    });
+  });
+});
+
+router.get("/view/:id", function(req, res, next) {
+  const q = `select S.name as sname, S.description, S.price, W.firstname || ' ' || W.lastname as wname, C.name as cname, CR.name as rname
+  from services S join accounts W on W.id = S.workerid join categories C on C.catid = S.catid join cityregions CR on CR.regionid = S.regionid
+  where S.serviceid=$1`;
+  pool.query(q, [req.params.id], function(err, data) {
+    if (err) {
+      genericError(req, res, "/services");
+      return;
+    }
+    if (data.rowCount === 0) {
+      req.flash("warning", "That service does not exist!");
+      res.redirect("/services");
+      return;
+    }
+    res.render("services/view", {
+      title: "Service Details",
+      navCat: "services",
+      details: data.rows[0],
+      loggedIn: req.user
     });
   });
 });
