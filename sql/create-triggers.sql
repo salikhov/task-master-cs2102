@@ -198,3 +198,27 @@ create trigger check_referrer
 before insert or update on refers
 for each row
 execute procedure check_referrer();
+
+
+/* ===============================================
+ * FUNCTIONs and TRIGGERs to enforce that discount
+ can have an amount or percentage
+ * =============================================== */
+create or replace function check_discount()
+returns trigger as $$
+begin
+  if (new.amount is NULL and new.percent is NULL) then
+    raise notice 'Discount must have amount/percentage!';
+    return null;
+  else 
+    return new; 
+  end if;
+end;
+$$ language plpgsql;
+
+drop trigger if exists check_discount on discounts;
+
+create trigger check_discount
+before insert or update on discounts
+for each row
+execute procedure check_discount();

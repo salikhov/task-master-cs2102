@@ -208,15 +208,26 @@ insert into bookingdetails (starttime, endtime, address, billingid, userid, work
 ================ AVAILABILITY =================
 ***********************************************
 **********************************************/
-insert into AVAILABILITY (21, '2019-06-05 15:00', '2019-06-12 15:00');
-insert into AVAILABILITY (22, '2019-06-06 15:00', '2019-06-13 15:00');
-insert into AVAILABILITY (23, '2019-06-05 14:00', '2019-06-12 15:00');
-insert into AVAILABILITY (24, '2019-06-05 15:00', '2019-06-12 18:00');
-insert into AVAILABILITY (25, '2019-07-05 15:00', '2019-07-12 15:00');
-insert into AVAILABILITY (26, '2019-06-18 15:00', '2019-06-28 15:00');
-insert into AVAILABILITY (27, '2019-06-05 15:35', '2019-06-12 17:00');
-insert into AVAILABILITY (28, '2019-06-15 15:00', '2019-06-31 15:00');
-insert into AVAILABILITY (29, '2019-06-05 15:00', '2019-06-12 15:00');
-insert into AVAILABILITY (30, '2019-06-10 15:00', '2019-06-12 19:00');
-insert into AVAILABILITY (31, '2019-06-05 15:00', '2019-06-12 15:00');
-insert into AVAILABILITY (32, '2019-06-03 15:00', '2019-06-12 09:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (21, '2019-06-05 15:00', '2019-06-12 15:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (22, '2019-06-06 15:00', '2019-06-13 15:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (23, '2019-06-05 14:00', '2019-06-12 15:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (24, '2019-06-05 15:00', '2019-06-12 18:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (25, '2019-07-05 15:00', '2019-07-12 15:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (26, '2019-06-18 15:00', '2019-06-28 15:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (27, '2019-06-05 15:35', '2019-06-12 17:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (28, '2019-06-15 15:00', '2019-06-17 15:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (29, '2019-06-05 15:00', '2019-06-12 15:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (30, '2019-06-10 15:00', '2019-06-12 19:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (31, '2019-06-05 15:00', '2019-06-12 15:00');
+insert into AVAILABILITY (workerid, starttime, endtime) values (32, '2019-06-03 15:00', '2019-06-12 09:00');
+
+/**********************************************
+***********************************************
+================ DISCOUNTS ====================
+***********************************************
+**********************************************/
+insert into discounts (discountid, promocode, amount, percent) values (1, 'FREE', 5, null)
+insert into discounts (discountid, promocode, amount, percent) values (2, 'NICE', null, 10)
+insert into discounts (discountid, promocode, amount, percent) values (3, 'SPECIAL', null, 5)
+insert into discounts (discountid, promocode, amount, percent) values (4, 'CODE', 25, null)
+insert into discounts (discountid, promocode, amount, percent) values (5, 'NEW', null, 15)
