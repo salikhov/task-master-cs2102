@@ -10,7 +10,7 @@ let return_data = {};
 
 function checkPermissions(req, res, next) {
   pool.query(
-    "select 1 from bookingdetails where userid=$1 and bookingid=$2",
+    "select 1 from bookingdetails where (userid=$1 or workerid=$1) and bookingid=$2",
     [req.user.id, req.params.id],
     function(err, data) {
       if (!err && data && data.rowCount !== 0) {
@@ -93,15 +93,33 @@ router.get("/view/:id", checkLoggedIn, checkPermissions, function(
   res,
   next
 ) {
-  // you can access the value of :id by using req.params.id
-  // basically you would enter something like /booking/view/5 into the browser
-  // and this page should show you a summary of it if it exists
-  // and if you have permission to view it (you're either the worker or user in it)
-  // this page basically deprecates summary
-  res.render("booking/view", {
-    title: "Booking Summary",
-    navCat: "booking",
-    loggedIn: req.user
+  const q = `select B.bookingid, starttime, endtime, B.address, comments, C.name as catname, CR.name as regname,
+  S.price, S.name as sname, S.description, U.phone as cphone, W.phone as wphone, A1.email as wemail, A2.email as cemail,
+  A1.firstname || ' ' || A1.lastname as wname, A2.firstname || ' ' || A2.lastname as cname,
+  substring(cashmoney.cardnumber, length(cashmoney.cardnumber) - 3, 4) as lastFour
+  from bookingdetails B join services S on S.serviceid = B.serviceid
+  join categories C on C.catid = S.catid join cityregions CR on CR.regionid = S.regionid
+  join accounts A1 on A1.id = B.workerid join accounts A2 on A2.id = B.userid
+  join users U on U.id = B.userid join workers W on W.id = B.workerid
+  join billingdetails as cashmoney on cashmoney.billingid = B.billingid
+  where bookingid=$1`;
+  pool.query(q, [req.params.id], function(err, data) {
+    if (err) {
+      genericError(req, res);
+      return;
+    }
+    if (data.rowCount === 0) {
+      req.flash("warning", "That booking does not exist!");
+      res.redirect("/");
+      return;
+    }
+    res.render("booking/view", {
+      title: "Booking Summary",
+      navCat: "booking",
+      booking: data.rows[0],
+      moment: moment,
+      loggedIn: req.user
+    });
   });
 });
 
