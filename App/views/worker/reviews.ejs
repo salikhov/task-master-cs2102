@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %> <%- include ./_partials/navtabs.ejs %>
+      <h4>Your Reviews Summary</h4>
+      <div class="row">
+        <div class="col-sm">
+          <strong
+            >Average Rating: <%= avgRating == null ? "N/A" :
+            Math.round(avgRating * 100) / 100 %></strong
+          >
+        </div>
+        <div class="col-sm">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Region</th>
+                <th>Rating</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for (let i = 0; i < byRegion.length; i++) { %>
+              <tr>
+                <td><%= byRegion[i].name %></td>
+                <td><%= Math.round(byRegion[i].avg * 100) / 100 %></td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Rating</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for (let i = 0; i < byCategory.length; i++) { %>
+              <tr>
+                <td><%= byCategory[i].name %></td>
+                <td><%= Math.round(byCategory[i].avg * 100) / 100 %></td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <hr />
+      <h4>Your Reviews</h4>
+      <% if (reviews.length === 0) { %>
+      <p>You do not have any reviews yet!</p>
+      <% } else { %>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Rating</th>
+            <th>Review</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let i = 0; i < reviews.length; i++) { %>
+          <tr>
+            <td><%= reviews[i].rating %></td>
+            <td><%= reviews[i].review %></td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+  </body>
+</html>

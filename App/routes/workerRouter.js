@@ -178,6 +178,53 @@ router.get("/availability", checkWorkerLoggedIn, function(req, res, next) {
   );
 });
 
+/* GET reviews - Worker Panel Reviews */
+router.get("/reviews", checkWorkerLoggedIn, function(req, res, next) {
+  const textReviewQuery = `select rating, review from reviews R join bookingdetails B on B.reviewid = R.reviewid
+  where review <> '' and review is not null and B.workerid=$1 order by B.endtime desc`;
+  const ratingByRegion = `select CR.regionid, CR.name, avg(R.rating) from reviews R join bookingdetails B on B.reviewid = R.reviewid
+  join services S on B.serviceid = S.serviceid join cityregions CR on S.regionid = CR.regionid where B.workerid=$1
+  group by CR.regionid`;
+  const ratingByCategory = `select C.catid, C.name, avg(R.rating) from reviews R join bookingdetails B on B.reviewid = R.reviewid
+  join services S on B.serviceid = S.serviceid join categories C on S.catid = C.catid where B.workerid=$1
+  group by C.catid`;
+  const avgRating = `select avg(R.rating) from reviews R join bookingdetails B on B.reviewid=R.reviewid where B.workerid=$1`;
+  pool.query(textReviewQuery, [req.user.id], function(err, data1) {
+    if (err) {
+      genericError(req, res, "/worker");
+      return;
+    }
+    pool.query(avgRating, [req.user.id], function(err, data2) {
+      if (err) {
+        genericError(req, res, "/worker");
+        return;
+      }
+      pool.query(ratingByRegion, [req.user.id], function(err, data3) {
+        if (err) {
+          genericError(req, res, "/worker");
+          return;
+        }
+        pool.query(ratingByCategory, [req.user.id], function(err, data4) {
+          if (err) {
+            genericError(req, res, "/worker");
+            return;
+          }
+          res.render("worker/reviews", {
+            title: "Worker Panel",
+            navCat: "worker",
+            wNavCat: "reviews",
+            reviews: data1.rows,
+            avgRating: data2.rows[0].avg,
+            byRegion: data3.rows,
+            byCategory: data4.rows,
+            loggedIn: req.user
+          });
+        });
+      });
+    });
+  });
+});
+
 /* =====================================
    ========= BOOKINGS ACTIONS ==========
    ===================================== */
