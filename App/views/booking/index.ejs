@@ -7,11 +7,92 @@
   <body>
     <div class="container">
       <%- include ../_partials/nav.ejs %>
-      <h1>Bookings Summary</h1>
-      <p>
-        If a user is both a user and a worker, then should have sections for
-        both roles.
-      </p>
+      <h3>Bookings Summary</h3>
+      <h4>Upcoming Bookings</h4>
+      <% if (bookings.length === 0) { %>
+      <p>You don't have any upcoming bookings</p>
+      <% } else { %>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Service</th>
+            <th>Price</th>
+            <th>Time</th>
+            <th>Address</th>
+            <th>Worker Name</th>
+            <th>Worker Contact</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let i = 0; i < bookings.length; i++) { %>
+          <tr>
+            <td><%= bookings[i].cleaningname %></td>
+            <td><%= "$" + bookings[i].price %></td>
+            <td>
+              <%= moment(bookings[i].starttime).format('llll') + " " + "to"
+              %><br /><%= moment(bookings[i].endtime).format('llll') %>
+            </td>
+            <td><%= bookings[i].address%></td>
+            <td><%= bookings[i].firstname + " " + bookings[i].lastname%></td>
+            <td><%= bookings[i].email %><br /><%= bookings[i].workerphone%></td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a
+                  class="btn btn-secondary btn-sm"
+                  href="/booking/view/<%= bookings[i].bookingid %>"
+                  >Details</a
+                >
+                <a
+                  class="btn btn-danger btn-sm"
+                  onclick="return confirm('Are you sure?');"
+                  href="/booking/cancel/<%= bookings[i].bookingid %>"
+                  >Cancel</a
+                >
+              </div>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
+      <hr />
+      <h4>Past Bookings</h4>
+      <% if (pastBookings.length === 0) { %>
+      <p>You don't have any past bookings</p>
+      <% } else { %>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Service</th>
+            <th>Price</th>
+            <th>Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let i = 0; i < pastBookings.length; i++) { %>
+          <tr>
+            <td><%= pastBookings[i].cleaningname %></td>
+            <td><%= "$" + pastBookings[i].price %></td>
+            <td>
+              <%= moment(pastBookings[i].starttime).format('llll') + " " + "to"
+              %><br /><%= moment(pastBookings[i].endtime).format('llll') %>
+            </td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a
+                  class="btn btn-secondary btn-sm"
+                  href="/booking/view/<%= pastBookings[i].bookingid %>"
+                  >Details</a
+                >
+              </div>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
     </div>
   </body>
 </html>

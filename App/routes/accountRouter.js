@@ -234,29 +234,6 @@ router.post("/register", checkLoggedOut, function(req, res, next) {
 /* =====================================
    ============= OPERATIONS ============
    ===================================== */
-/* GET - Summary page (profile) */
-router.get("/", checkLoggedIn, function(req, res, next) {
-  pool.query(
-    "select bookingid,t3.name as cleaningname,price,starttime,endtime,address,firstname,lastname,email,t4.phone " +
-      "as workerphone,userId from (select bookingid,starttime,endtime,address,t1.workerid as theworkerid,firstname,lastname,email, " +
-      "t2.name,price,keepthis as userId from (select bookingid,starttime,endtime,address,workerid,serviceid,email, salt,firstname,lastname,userid " +
-      "as keepthis from bookingdetails join accounts on (workerid = id)) as t1 join services as t2 on (t1.serviceid = t2.serviceid)) " +
-      "as t3 join workers as t4 on (t3.theworkerid = t4.id) where userId = $1 ORDER by bookingid, price, starttime",
-    [req.user.id],
-    function(err, data) {
-      if (err) {
-        genericError(req, res);
-        return;
-      }
-      res.render("account/index", {
-        title: "Account",
-        navCat: "account_view",
-        bookings: data.rows,
-        loggedIn: req.user
-      });
-    }
-  );
-});
 
 /* GET - Edit account details */
 router.get("/edit", checkLoggedIn, function(req, res, next) {

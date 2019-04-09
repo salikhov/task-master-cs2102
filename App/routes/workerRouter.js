@@ -188,12 +188,16 @@ router.get(
   function(req, res, next) {
     pool.query(
       "delete from billingdetails C using bookingdetails B" +
-        " where B.billingid = C.billingid and B.bookingid = $1",
+        " where B.billingid = C.billingid and B.bookingid = $1 and endtime >= NOW()",
       [req.params.id],
       function(err, data) {
         if (err) {
           genericError(req, res, "/worker/bookings");
           return;
+        }
+        if (data.rowCount === 0) {
+          req.flash("warning", "Booking cannot be cancelled");
+          res.redirect("/booking");
         }
         req.flash("success", "Booking cancelled");
         res.redirect("/worker/bookings");

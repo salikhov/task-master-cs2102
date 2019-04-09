@@ -2,24 +2,89 @@ const async = require("async");
 const express = require("express");
 const router = express.Router();
 const { checkLoggedIn, checkUserLoggedIn } = require("./middleware/auth");
+const { genericError } = require("../db/util");
 const pool = require("../db");
+const moment = require("moment");
 
 let return_data = {};
 
 function checkPermissions(req, res, next) {
-  if (true) return next(); // this should happen if the user has permission to view booking summary
-  // to access user id do req.user.id
-  // to access the requested booking id use req.params.id
-  // then run some queries to make sure the user can view its details
+  pool.query(
+    "select 1 from bookingdetails where userid=$1 and bookingid=$2",
+    [req.user.id, req.params.id],
+    function(err, data) {
+      if (!err && data && data.rowCount !== 0) {
+        return next();
+      } else {
+        req.flash("warning", "You cannot access that page!");
+        res.redirect("/");
+        return;
+      }
+    }
+  );
 }
 
-/* GET index - Booking Index Page */
-router.get("/", checkLoggedIn, function(req, res, next) {
-  res.render("booking/index", {
-    title: "Booking",
-    navCat: "booking",
-    loggedIn: req.user
+router.get("/", checkUserLoggedIn, function(req, res, next) {
+  const futureBookingsQ =
+    "select bookingid,t3.name as cleaningname,price,starttime,endtime,address,firstname,lastname,email,t4.phone " +
+    "as workerphone,userId from (select bookingid,starttime,endtime,address,t1.workerid as theworkerid,firstname,lastname,email, " +
+    "t2.name,price,keepthis as userId from (select bookingid,starttime,endtime,address,workerid,serviceid,email, salt,firstname,lastname,userid " +
+    "as keepthis from bookingdetails join accounts on (workerid = id)) as t1 join services as t2 on (t1.serviceid = t2.serviceid)) " +
+    "as t3 join workers as t4 on (t3.theworkerid = t4.id) where userId = $1 and endtime >= NOW()" +
+    " ORDER by bookingid, price, starttime";
+
+  const pastBookingsQ =
+    "select bookingid,t3.name as cleaningname,price,starttime,endtime,address,firstname,lastname,email,t4.phone " +
+    "as workerphone,userId from (select bookingid,starttime,endtime,address,t1.workerid as theworkerid,firstname,lastname,email, " +
+    "t2.name,price,keepthis as userId from (select bookingid,starttime,endtime,address,workerid,serviceid,email, salt,firstname,lastname,userid " +
+    "as keepthis from bookingdetails join accounts on (workerid = id)) as t1 join services as t2 on (t1.serviceid = t2.serviceid)) " +
+    "as t3 join workers as t4 on (t3.theworkerid = t4.id) where userId = $1 and endtime < NOW()" +
+    " ORDER by bookingid, price, endtime desc";
+
+  pool.query(futureBookingsQ, [req.user.id], function(err, data) {
+    if (err) {
+      genericError(req, res);
+      return;
+    }
+    pool.query(pastBookingsQ, [req.user.id], function(err, data2) {
+      if (err) {
+        genericError(req, res);
+        return;
+      }
+      res.render("booking/index", {
+        title: "Booking Summary",
+        navCat: "booking",
+        bookings: data.rows,
+        pastBookings: data2.rows,
+        moment: moment,
+        loggedIn: req.user
+      });
+    });
   });
+});
+
+router.get("/cancel/:id", checkUserLoggedIn, checkPermissions, function(
+  req,
+  res,
+  next
+) {
+  pool.query(
+    "delete from billingdetails C using bookingdetails B" +
+      " where B.billingid = C.billingid and B.bookingid = $1 and endtime >= NOW()",
+    [req.params.id],
+    function(err, data) {
+      if (err) {
+        genericError(req, res, "/booking");
+        return;
+      }
+      if (data.rowCount === 0) {
+        req.flash("warning", "Booking cannot be cancelled");
+        res.redirect("/booking");
+      }
+      req.flash("success", "Booking cancelled");
+      res.redirect("/booking");
+    }
+  );
 });
 
 /* GET view - Booking Summary Page for Particular Booking */
