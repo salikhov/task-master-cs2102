@@ -226,8 +226,8 @@ insert into AVAILABILITY (workerid, starttime, endtime) values (32, '2019-06-03 
 ================ DISCOUNTS ====================
 ***********************************************
 **********************************************/
-insert into discounts (discountid, promocode, amount, percent) values (1, 'FREE', 5, null)
-insert into discounts (discountid, promocode, amount, percent) values (2, 'NICE', null, 10)
-insert into discounts (discountid, promocode, amount, percent) values (3, 'SPECIAL', null, 5)
-insert into discounts (discountid, promocode, amount, percent) values (4, 'CODE', 25, null)
-insert into discounts (discountid, promocode, amount, percent) values (5, 'NEW', null, 15)
+insert into discounts (promocode, amount, percent) values ('NICE', null, 10);
+insert into discounts (promocode, amount, percent) values ('SPECIAL', null, 5);
+insert into discounts (promocode, amount, percent) values ('FREE', 5, null);
+insert into discounts (promocode, amount, percent) values ('CODE', 25, null);
+insert into discounts (promocode, amount, percent) values ('NEW', null, 15);

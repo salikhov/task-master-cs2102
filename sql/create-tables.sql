@@ -89,7 +89,8 @@ create table discounts (
   discountId  serial        primary key,
   promoCode   varchar(12)   not null unique,
   amount      numeric       check (amount > 0),
-  percent     numeric       check (percent > 0 and percent < 100)
+  percent     numeric       check (percent > 0 and percent < 100),
+  check ((amount is null and percent is not null) or (amount is not null and percent is null))
 );
 
 create table billingdetails (
