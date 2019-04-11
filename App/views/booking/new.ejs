@@ -28,59 +28,79 @@
     <div class="container">
       <%- include ../_partials/nav.ejs %>
       <h1>Create New Booking</h1>
+      <h5><%= serviceDetails[0].name %>:
+      $<%= serviceDetails[0].price %> per hour
+      </br>
+        <% if (serviceDetails[0].description != 'N/A') { %> Description: <%=serviceDetails[0].description%><% } %>
+    </h5>
+    <h6><% if (availability.length === 0) { %> Worker is currently not available. <%}
+      else {%>
+      Worker is available during the following times:
+      
+      <% for (let i = 0; i < availability.length; i++) { %>
+      </br>
+        <%=availability[i].starttime%> - <%=availability[i].endtime %>
+       <% } %>
+       <% } %>
+    </h6>
       <form id="html_form" action="create" role="form" method="post">
-        <div class="form-group">
-          <label for="startTime">Start Time</label>
-          <input
+          <input type="hidden" id="isDateValid" name="isDateValid" value="false">
+        <input type="hidden" id="datesAvailableHidden" value="<%= JSON.stringify(datesAvailable) %>" />
+        <input type="hidden" id="availabilityHidden" name="availabilityHidden" value="<%= JSON.stringify(availability) %>" />
+        <input type="hidden" id="serviceDetailsHidden" value="<%= JSON.stringify(serviceDetails) %>" /> 
+        <input type="hidden" id="discountCodesHidden" value="<%= JSON.stringify(discountCodes) %>" /> 
+        <input type="hidden" id="billingPriceHidden" value=0 /> 
+        <input type="hidden" id="discountCodeUserMatches" value="false" /> 
+        <label for="startTime">Work Time</label>
+        <!-- <input hidden
+        type="text"
+        class="form-control"
+        id="startTime"
+        name="startTime"
+        onchange="validateDateSelection(event.target)"
+
+      /> -->
+        
+        <input
             type="text"
             class="form-control"
             id="startTime"
             aria-describedby="startTimeHelp"
             name="startTime"
             placeholder="Enter Start Time"
+            onchange="validateDateSelection(event.target)"
             required
           />
+          <div class="invalid-feedback">
+              &nbsp;&nbsp;&nbsp;&nbsp; You should choose a range where the worker is available!
+            </div>
           <script>
             $(function() {
               $('input[name="startTime"]').daterangepicker({
+                format: 'L',
                 timePicker: true,
-                singleDatePicker: true,
+                startDate: 1,
+                isInvalidDate: function(date) {
+                  console.log($("#datesAvailableHidden").val());
+                  console.log(date.format("YYYY-MM-DD"));
+                  if ($("#datesAvailableHidden").val().includes(date.format("YYYY-MM-DD"))) {
+                    return false; 
+                  } else {
+                     return true; 
+                }
+                },
                 locale: {
-                  format: "YYYY-MM-DD hh:mm A"
+                  format:  "ddd, MMM D, YYYY h:mm A"
+
+                 
                 }
               });
             });
+            
           </script>
           <small id="startTimeHelp" class="form-text text-muted"
-            >Enter the time you would like work to start</small
+            >Enter the time you would like work to start and end. Please refer to worker availability above.</small
           >
-        </div>
-        <div class="form-group">
-          <label for="endTime">End Time</label>
-          <input
-            type="text"
-            class="form-control"
-            id="endTime"
-            aria-describedby="endTimeHelp"
-            name="endTime"
-            placeholder="Enter End Time"
-            required
-          />
-          <script>
-            $(function() {
-              $('input[name="endTime"]').daterangepicker({
-                timePicker: true,
-                singleDatePicker: true,
-                locale: {
-                  format: "YYYY-MM-DD hh:mm A"
-                }
-              });
-            });
-          </script>
-          <small id="endTimeHelp" class="form-text text-muted"
-            >Enter the time you would like work to end</small
-          >
-        </div>
         <div class="form-group">
           <label for="address">Address</label>
           <input
@@ -89,6 +109,7 @@
             id="address"
             placeholder="Enter address"
             name="address"
+            minlength="5"
             required
           />
         </div>
@@ -107,42 +128,26 @@
           >
         </div>
         <div class="form-group">
-          <label for="workerID">Worker ID</label>
-          <br />
-          <select
-            id="workerID"
-            class="form-control"
-            placeholder="Choose the Worker"
-            name="workerID"
-            required
-          >
-            <option value="" hidden>Worker Name</option>
-            <% for(let i = 0; i < workers.length; i++) { %>
-            <option value="<%= workers[i].workerid %>">
-              <%= workers[i].firstname + " " + workers[i].lastname%></option
-            >
-            <% } %>
-          </select>
+          <input type="hidden"  class="form-control" value="<%= serviceDetails[0].serviceid %>" name="serviceID"/>
         </div>
         <div class="form-group">
-          <label for="serviceID">Service ID</label>
-          <br />
-          <select
-            id="serviceID"
-            class="form-control"
-            placeholder="Choose the Service"
-            name="serviceID"
-          >
-            <option value="" hidden>Service Type</option>
-            <% for(let i = 0; i < services.length; i++) { %>
-            <option value="<%= services[i].serviceid %>"
-              ><%= services[i].name + " $" + services[i].price%></option
-            >
-            <% } %>
-          </select>
-        </div>
+            <input type="hidden"  class="form-control" value="<%= availability%>" name="availabilityValues"/>
+          </div>
         <h2>Billing Details</h2>
+        <h6 id="billingPrice"></h6>
         <div class="form-group">
+            <label for="discountCode">Discount Code</label>
+            <input
+              type="text"
+              class="form-control"
+              id="discountCode"
+              placeholder="Enter discount code"
+              name="discountCode"
+              onkeyup="discountPrice()"
+            />
+          </div>
+          <h6 id="discountMsg"></h6>
+            <div class="form-group">
           <label for="cardNumber">Card Number</label>
           <input
             type="text"
@@ -150,26 +155,52 @@
             id="cardNumber"
             placeholder="Enter card number"
             name="cardNumber"
+            minlength="16"
+            maxlength="16"
             required
           />
           <small id="cardNumberHelp" class="form-text text-muted"
             >Must be 16 digits</small
           >
         </div>
-        <div class="form-group">
-          <label for="expDate">Expiry Date</label>
-          <input
-            type="text"
-            class="form-control"
-            id="expDate"
-            placeholder="Enter card expiry date"
-            name="expDate"
-            required
-          />
-          <small id="expDateHelp" class="form-text text-muted"
-            >Must be 5 digits</small
-          >
-        </div>
+            <div class="form-group" id="expiration-date" onchange="setExpDate()">
+                <label>Expiration Date</label>
+                <select required forms="html_form" id="month" name="month" class="form-group">
+                    <option value=""></option>
+                    <option value="01">January</option>
+                    <option value="02">February </option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <select required  forms="html_form" id="year" name="year" class="form-group">
+                    <option value=""></option>
+                    <option value="19"> 2019</option>
+                    <option value="20"> 2020</option>
+                    <option value="21"> 2021</option>
+                    <option value="22"> 2022</option>
+                    <option value="23"> 2023</option>
+                    <option value="24"> 2024</option>
+                </select>
+                <input
+                type="hidden"
+                class="form-control"
+                id="expDate"
+                placeholder="Enter card expiry date"
+                name="expDate"
+                minlength="4"
+                maxlength="4"
+                value=""
+                required
+              />
+            </div>
         <div class="form-group">
           <label for="cvv">CVV</label>
           <input
@@ -178,10 +209,12 @@
             id="cvv"
             placeholder="Enter card cvv"
             name="cvv"
+            minlength="3"
+            maxlength="4"
             required
           />
           <small id="cvvHelp" class="form-text text-muted"
-            >Must be 4 digits</small
+            >Must be at 3 or 4 digits</small
           >
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
@@ -191,18 +224,164 @@
     </div>
 
     <script>
+    function billingPrice() {
+      var x = document.getElementById("startTime").value;
+      console.log('X', x)
+          var parsedDate = x.split("-");
+          var startDate   = moment(parsedDate[0]);
+          var endDate     = moment(parsedDate[1]);
+          console.log('parsed', parsedDate, startDate)
+          const hours = endDate.diff(startDate, 'hours');
+          console.log(hours);
+          const y = JSON.parse(($("#serviceDetailsHidden").val()));
+          const pricePerHour = y[0].price;
+          const billingPrice = hours * pricePerHour;
+          if(hours === 0) {
+            document.getElementById("billingPrice").innerHTML = "You selected 0 hours"
+            document.getElementById("billingPriceHidden").value = 0;
+          }else{
+          document.getElementById("billingPrice").innerHTML = hours + "hour(s) x $" + pricePerHour + "/hour = $" + billingPrice + ".";
+          document.getElementById("billingPriceHidden").value = billingPrice;
+        }
+        }
+    </script>
+
+    <script>
+     function discountPrice() {
+      const discountCodeUser = document.getElementById("discountCode").value;
+      const billingPrice = document.getElementById("billingPriceHidden").value;
+      console.log(discountCodeUser, billingPrice);
+          const z = JSON.parse(($("#discountCodesHidden").val()));
+          let discountCodeUserMatches = "";
+          let percentageOff = 0;
+          let numberOff = 0;
+          for (let i = 0; i < z.length; i ++){
+            console.log(z[i].promocode)
+            if (z[i].promocode === discountCodeUser) {
+              console.log("MATCHES", z[i].promocode)
+              discountCodeUserMatches = discountCodeUser;
+              document.getElementById("discountCodeUserMatches").value = z[i].discountid;
+              if (z[i].percent > 0) {
+                percentageOff = z[i].percent;
+              } else if (z[i].amount > 0) {
+                numberOff = z[i].amount;
+              }
+              break;
+            }
+          }
+          let discountMsg = "Your card will be charged a total of $" + billingPrice + ".";
+          let finalPrice = null;
+          if (percentageOff !== 0) {
+            finalPrice = (billingPrice*(1-percentageOff/100));
+            if (finalPrice < 0){
+              finalPrice = 0;
+            } 
+            discountMsg = "Your discount code gave you " + percentageOff + "% off your final price. Your card will be charged a total of $" 
+            + finalPrice + ".";
+            
+          } else if (numberOff !== 0) {
+            console.log(numberOff)
+            finalPrice = (billingPrice-numberOff);
+            if (finalPrice < 0){
+              finalPrice = 0;
+            }
+            discountMsg ="Your discount code gave you $" + numberOff + " off your final price. Your card will be charged a total of $" 
+            + finalPrice + ".";
+            
+          }
+          if(billingPrice == 0){
+            document.getElementById("discountMsg").innerHTML = "Your card will not be charged as your final price is $0.";
+          }else{
+          document.getElementById("discountMsg").innerHTML = discountMsg;
+          }
+     }
+    </script>
+
+    <script>
+        function validateDateSelection(timeInput) {
+          const availability = JSON.parse(($("#availabilityHidden").val()));
+          var x = document.getElementById("startTime").value;
+          console.log('x', x)
+          var parsedDate = x.split(" - ");
+          var startDate   = moment(parsedDate[0]);
+          var endDate     = moment(parsedDate[1]);
+          console.log('parsed', parsedDate, startDate)
+          
+          for (let i = 0; i < availability.length; i++){
+            var start = moment(availability[i].starttime);
+            var finish = moment(availability[i].endtime);
+            console.log(start, finish)
+            timeInput.classList.add("is-invalid");
+
+            if (startDate.isBetween(start, finish, 'hours', '[]') && endDate.isBetween(start, finish, 'hours', '[]')){
+              timeInput.classList.remove("is-invalid");
+              timeInput.classList.add("is-valid");
+              console.log(document.getElementById("isDateValid").value)
+              document.getElementById("isDateValid").value = "true";
+              console.log(document.getElementById("isDateValid").value)
+              billingPrice();
+              discountPrice();
+              return true;
+            } else {
+              discountPrice();
+            }
+          }
+        }
+        </script>
+
+    <script>
       (function() {
         window.addEventListener(
           "load",
           function() {
             var forms = [document.getElementById("html_form")];
             var validation = Array.prototype.filter.call(forms, function(form) {
-              form.addEventListener("submit", check, false);
+              form.addEventListener("submit", checkBookingForm, false);
             });
           },
           false
         );
       })();
     </script>
+
+    <script>
+        function checkBookingForm(event) {
+          console.log("CHECKING")
+            if (document.getElementById("isDateValid").value === "false"){
+              alert("The dates selected must match the availability of the worker.");
+              event.preventDefault();
+              event.stopPropagation();
+              return false;
+            }
+            let isNumCardNumber = /^\d+$/.test(document.getElementById("cardNumber").value);
+            if (!isNumCardNumber){
+              alert("The card number in billing details must only contain digits.");
+              event.preventDefault();
+              event.stopPropagation();
+              return false;
+            }
+            const isNumCvv = /^\d+$/.test(document.getElementById("cvv").value);
+            if (!isNumCvv){
+              alert("The CVV in billing details must only contain digits.");
+              event.preventDefault();
+              event.stopPropagation();
+              return false;
+            }
+            if (document.getElementById("expDate").value === ""){
+              alert("You must enter an expiry Date for your billing details.");
+              event.preventDefault();
+              event.stopPropagation();
+              return false;
+            }
+        }
+    </script>
+    <script>
+    function setExpDate(){
+     document.getElementById("expDate").value = document.getElementById("month").value + document.getElementById("year").value;
+    console.log(document.getElementById("expDate").value)
+    }
+    
+    </script>
+
   </body>
 </html>
