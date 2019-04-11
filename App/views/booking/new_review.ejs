@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This just includes stuff that should go in head such as title and CSS/JS inclusions -->
+    <%- include ../_partials/head.ejs %>
+  </head>
+  <body>
+    <div class="container">
+      <%- include ../_partials/nav.ejs %>
+      <h4>Review - Booking ID: <%= bookingId %></h4>
+      <form action="/booking/review/<%= bookingId %>" method="post">
+        <div class="form-row">
+          <div class="col form-group">
+            <label for="inlineRadio1">Rating</label><br />
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="rating"
+                id="inlineRadio1"
+                value="1"
+              />
+              <label class="form-check-label" for="inlineRadio1">1</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="rating"
+                id="inlineRadio2"
+                value="2"
+              />
+              <label class="form-check-label" for="inlineRadio2">2</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="rating"
+                id="inlineRadio3"
+                value="3"
+              />
+              <label class="form-check-label" for="inlineRadio3">3</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="rating"
+                id="inlineRadio4"
+                value="4"
+              />
+              <label class="form-check-label" for="inlineRadio4">4</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="rating"
+                id="inlineRadio5"
+                value="5"
+              />
+              <label class="form-check-label" for="inlineRadio5">5</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="col form-group">
+            <label for="review">Review</label>
+            <textarea class="form-control" id="review" name="review"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Review</button>
+      </form>
+    </div>
+  </body>
+</html>

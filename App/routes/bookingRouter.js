@@ -24,6 +24,22 @@ function checkPermissions(req, res, next) {
   );
 }
 
+function checkNotReviewed(req, res, next) {
+  pool.query(
+    "select 1 from bookingdetails where bookingid=$1 and endtime < NOW() and reviewid is null",
+    [req.params.id],
+    function(err, data) {
+      if (err || !data || data.rowCount === 0) {
+        req.flash("warning", "That booking cannot be reviewed");
+        res.redirect("/booking");
+        return;
+      } else {
+        return next();
+      }
+    }
+  );
+}
+
 router.get("/", checkUserLoggedIn, function(req, res, next) {
   const futureBookingsQ =
     "select bookingid,t3.name as cleaningname,price,starttime,endtime,address,firstname,lastname,email,t4.phone " +
@@ -33,22 +49,25 @@ router.get("/", checkUserLoggedIn, function(req, res, next) {
     "as t3 join workers as t4 on (t3.theworkerid = t4.id) where userId = $1 and endtime >= NOW()" +
     " ORDER by bookingid, price, starttime";
 
-  const pastBookingsQ =
-    "select bookingid,t3.name as cleaningname,price,starttime,endtime,address,firstname,lastname,email,t4.phone " +
-    "as workerphone,userId from (select bookingid,starttime,endtime,address,t1.workerid as theworkerid,firstname,lastname,email, " +
-    "t2.name,price,keepthis as userId from (select bookingid,starttime,endtime,address,workerid,serviceid,email, salt,firstname,lastname,userid " +
-    "as keepthis from bookingdetails join accounts on (workerid = id)) as t1 join services as t2 on (t1.serviceid = t2.serviceid)) " +
-    "as t3 join workers as t4 on (t3.theworkerid = t4.id) where userId = $1 and endtime < NOW()" +
-    " ORDER by bookingid, price, endtime desc";
+  const pastBookingsQ = `select
+    bookingid,t3.name as cleaningname,price,starttime,endtime,address,firstname,lastname,email,t4.phone as workerphone,userId, reviewid
+    from (
+    select
+    bookingid,starttime,endtime,address,t1.workerid as theworkerid, t1.reviewid,firstname,lastname,email, t2.name,price,keepthis as userId
+    from (
+    select
+    bookingid,starttime,endtime,address,workerid,serviceid,email, salt,firstname,lastname,userid as keepthis, reviewid
+    from bookingdetails join accounts on (workerid = id)) as t1 join services as t2 on (t1.serviceid = t2.serviceid)) as t3 join workers as t4 on (t3.theworkerid = t4.id) where userId = $1 and endtime < NOW()
+    ORDER by bookingid, price, endtime desc`;
 
   pool.query(futureBookingsQ, [req.user.id], function(err, data) {
     if (err) {
-      genericError(req, res);
+      genericError(req, res, "/");
       return;
     }
     pool.query(pastBookingsQ, [req.user.id], function(err, data2) {
       if (err) {
-        genericError(req, res);
+        genericError(req, res, "/");
         return;
       }
       res.render("booking/index", {
@@ -86,6 +105,56 @@ router.get("/cancel/:id", checkUserLoggedIn, checkPermissions, function(
     }
   );
 });
+
+/* GET new review - Page to create review for particular booking */
+router.get(
+  "/review/:id",
+  checkUserLoggedIn,
+  checkPermissions,
+  checkNotReviewed,
+  function(req, res, next) {
+    res.render("booking/new_review", {
+      title: "New Review",
+      navCat: "booking",
+      bookingId: req.params.id,
+      loggedIn: req.user
+    });
+  }
+);
+
+/* POST new review - action to create new review for a booking */
+router.post(
+  "/review/:id",
+  checkUserLoggedIn,
+  checkPermissions,
+  checkNotReviewed,
+  function(req, res, next) {
+    pool.query(
+      "insert into reviews (rating, review) values ($1, $2) returning reviewid",
+      [req.body.rating, req.body.review == "" ? null : req.body.review],
+      function(err, data1) {
+        if (err || !data1 || data1.rowCount === 0) {
+          console.log(err);
+          genericError(req, res, "/booking/review/" + req.params.id);
+          return;
+        }
+        const id = data1.rows[0].reviewid;
+        pool.query(
+          "update bookingdetails set reviewid=$1 where bookingid=$2",
+          [id, req.params.id],
+          function(err, data2) {
+            if (err) {
+              genericError(req, res, "/review/" + req.params.id);
+              return;
+            }
+            req.flash("success", "Review added");
+            res.redirect("/booking");
+          }
+        );
+      }
+    );
+  }
+);
 
 /* GET view - Booking Summary Page for Particular Booking */
 router.get("/view/:id", checkLoggedIn, checkPermissions, function(

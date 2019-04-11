@@ -86,6 +86,13 @@
                   href="/booking/view/<%= pastBookings[i].bookingid %>"
                   >Details</a
                 >
+                <% if (pastBookings[i].reviewid == null) { %>
+                <a
+                  class="btn btn-primary btn-sm"
+                  href="/booking/review/<%= pastBookings[i].bookingid %>"
+                  >Leave Review</a
+                >
+                <% } %>
               </div>
             </td>
           </tr>
