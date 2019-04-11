@@ -168,14 +168,24 @@ insert into services (serviceId, name, price, workerId, catId, regionId) values 
 ================== APPROVES ===================
 ***********************************************
 **********************************************/
+insert into approves (workerId, approved, adminId) values (21, true, 41);
+insert into approves (workerId, approved, adminId) values (22, true, 41);
 insert into approves (workerId, approved, adminId) values (23, true, 41);
 insert into approves (workerId, approved, adminId) values (24, true, 41);
 insert into approves (workerId, approved, adminId) values (25, true, 41);
 insert into approves (workerId, approved, adminId) values (26, true, 41);
+insert into approves (workerId, approved, adminId) values (27, true, 41);
 insert into approves (workerId, approved, adminId) values (28, true, 41);
 insert into approves (workerId, approved, adminId) values (29, true, 41);
+insert into approves (workerId, approved, adminId) values (30, true, 41);
+insert into approves (workerId, approved, adminId) values (31, true, 41);
 insert into approves (workerId, approved, adminId) values (32, true, 41);
 insert into approves (workerId, approved, adminId) values (33, true, 41);
+insert into approves (workerId, approved, adminId) values (34, true, 41);
+insert into approves (workerId, approved, adminId) values (35, true, 41);
+insert into approves (workerId, approved, adminId) values (36, true, 41);
+insert into approves (workerId, approved, adminId) values (37, true, 41);
+insert into approves (workerId, approved, adminId) values (38, true, 41);
 insert into approves (workerId, approved, adminId) values (39, true, 41);
 insert into approves (workerId, approved, adminId) values (40, true, 41);
 
@@ -197,11 +207,27 @@ insert into billingdetails (cardnumber, expdate, cvv) values ('5893801912974359'
 
 /**********************************************
 ***********************************************
+=================== REVIEWS ===================
+***********************************************
+**********************************************/
+insert into reviews (rating, review) values (5, 'Amazing service, on-time, great quality');
+insert into reviews (rating, review) values (2, 'Was late and did a sloppy job');
+insert into reviews (rating, review) values (4, 'Pretty good service');
+
+/**********************************************
+***********************************************
 =================== BOOKINGS ==================
 ***********************************************
 **********************************************/
-insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid) values ('2019-05-05 15:00', '2019-05-05 17:30', '49645 Golf Court', 2, 2, 29, 6);
-insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid) values ('2019-03-05 15:00', '2019-03-05 17:30', '49645 Golf Court', 3, 2, 29, 6);
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid) values ('2019-06-05 15:00', '2019-06-05 17:30', '49645 Golf Court', 1, 2, 29, 6);
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid, reviewid) values ('2019-03-05 15:00', '2019-03-05 17:30', '49645 Golf Court', 2, 2, 29, 6, 1);
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid, reviewid) values ('2019-03-05 15:00', '2019-03-05 17:30', '49645 Golf Court', 3, 3, 33, 19, 2);
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid) values ('2019-03-05 15:00', '2019-03-05 17:30', '49645 Golf Court', 4, 4, 33, 9);
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid) values ('2019-05-05 15:00', '2019-05-05 17:15', '49645 Golf Court', 5, 4, 31, 15);
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid) values ('2019-03-05 15:00', '2019-03-05 17:30', '49645 Golf Court', 6, 7, 38, 2);
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid, reviewid) values ('2019-03-05 15:00', '2019-03-05 17:30', '49645 Golf Court', 7, 8, 38, 3, 3);
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid) values ('2019-02-05 15:00', '2019-02-05 18:30', '49645 Golf Court', 8, 9, 21, 5);
+insert into bookingdetails (starttime, endtime, address, billingid, userid, workerid, serviceid) values ('2019-07-05 15:00', '2019-07-05 17:00', '49645 Golf Court', 9, 9, 29, 6);
 
 /**********************************************
 ***********************************************
