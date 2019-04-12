@@ -14,7 +14,11 @@
           <tr>
             <td><strong>Booking ID: </strong> <%= booking.bookingid %></td>
             <td><strong>Service: </strong> <%= booking.sname %></td>
-            <td><strong>Price: </strong> <%= booking.price %></td>
+            <td>
+              <strong>Price: </strong> $<%= booking.price *
+              Math.ceil(moment(booking.endtime).diff( moment(booking.starttime),
+              'hours', true )) %>
+            </td>
             <td>
               <strong>Start Time: </strong> <%=
               moment(booking.starttime).format('llll') %>
