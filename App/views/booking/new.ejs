@@ -50,7 +50,7 @@
         <input type="hidden" id="serviceDetailsHidden" value="<%= JSON.stringify(serviceDetails) %>" /> 
         <input type="hidden" id="discountCodesHidden" value="<%= JSON.stringify(discountCodes) %>" /> 
         <input type="hidden" id="billingPriceHidden" value=0 /> 
-        <input type="hidden" id="discountCodeUserMatches" value="false" /> 
+        <input type="hidden" id="discountCodeUserMatches" name="discountCodeUserMatches" value="0"/> 
         <label for="startTime">Work Time</label>
         <!-- <input hidden
         type="text"
@@ -261,6 +261,7 @@
               console.log("MATCHES", z[i].promocode)
               discountCodeUserMatches = discountCodeUser;
               document.getElementById("discountCodeUserMatches").value = z[i].discountid;
+              console.log("ID", z[i].discountid, "Y", document.getElementById("discountCodeUserMatches").value);
               if (z[i].percent > 0) {
                 percentageOff = z[i].percent;
               } else if (z[i].amount > 0) {

@@ -204,7 +204,6 @@ router.get("/view/:id", checkLoggedIn, checkPermissions, function(
 });
 
 function enumerateDaysBetweenDates(startDate, endDate) {
-  console.log("enumarete", startDate, endDate);
   var now = startDate.clone(),
     dates = [];
 
@@ -254,7 +253,9 @@ router.get("/new/:id", checkUserLoggedIn, function(req, res, next) {
         );
       },
       function(parallel_done) {
-        pool.query("select * from discounts;", function(err, discountCodes) {
+        pool.query("select discountid, promocode, percent, amount from discounts as D1 where not exists(select discountid from" +
+          " billingDetails where discountid=D1.discountid);", function(err, discountCodes) {
+            console.log("DISCOUNT CODES", discountCodes)
           if (err) return parallel_done(err);
           return_data.discountCodes = discountCodes;
           parallel_done();
@@ -264,19 +265,19 @@ router.get("/new/:id", checkUserLoggedIn, function(req, res, next) {
     function(err) {
       var datesAvailable = [];
       for (let i = 0; i < return_data.availability.rows.length; i++) {
-        console.log(return_data.availability.rows);
+
         const daysBetweenDates = enumerateDaysBetweenDates(
           moment(return_data.availability.rows[i].starttime).startOf("day"),
           moment(return_data.availability.rows[i].endtime).startOf("day")
         );
-        console.log(daysBetweenDates);
+
         for (let j = 0; j < daysBetweenDates.length; j++) {
           datesAvailable.push(daysBetweenDates[j]);
         }
       }
-      console.log(datesAvailable);
+
       let uniquedatesAvailable = [...new Set(datesAvailable)];
-      console.log("UNIQ", uniquedatesAvailable);
+
       if (err) console.log(err);
       res.render("booking/new", {
         title: "New Booking",
@@ -314,6 +315,7 @@ router.post("/new/create", checkUserLoggedIn, function(req, res, next) {
   const cvv = req.body.cvv;
   const availabilityHidden = JSON.parse(req.body.availabilityHidden);
   const discountID = req.body.discountCodeUserMatches;
+  console.log("DISCOUNTID", discountID)
 
   const retrieveServiceDetails_query =
     "SELECT * from services where serviceID ='" + serviceID + "';";
@@ -329,7 +331,7 @@ router.post("/new/create", checkUserLoggedIn, function(req, res, next) {
       pool.query(
         retrieveWorkerAccount_query,
         (err, retrieveWorkerAccountData) => {
-          const insertBillingDetails_query = discountID
+          const insertBillingDetails_query = (discountID !== "0")
             ? "INSERT into billingdetails VALUES(DEFAULT, '" +
               cardNumber +
               "', '" +
@@ -459,7 +461,6 @@ router.post("/new/create", checkUserLoggedIn, function(req, res, next) {
       let newAvailabilityEnd = availabilityEnd;
       let newAvailabilityStart2 = availabilityStart;
       let newAvailabilityEnd2 = availabilityEnd;
-      console.log("AVAILABIILITY", availabilityStart, startTimeChosenTimestamp);
       const updateAvailability_query =
         "update availability SET starttime=$1, endtime=$2 where (workerid=$3 and starttime=$4)" +
         " and endtime=$5";
@@ -470,7 +471,7 @@ router.post("/new/create", checkUserLoggedIn, function(req, res, next) {
         moment(availabilityStart).isBefore(startTimeChosenTimestamp) &&
         moment(availabilityEnd).isAfter(endTimeChosenTimestamp)
       ) {
-        console.log("INSIDE #1");
+
         newAvailabilityEnd = startTimeChosenTimestamp;
         newAvailabilityStart2 = endTimeChosenTimestamp;
         insertAvailability_query =
@@ -489,7 +490,7 @@ router.post("/new/create", checkUserLoggedIn, function(req, res, next) {
         moment(availabilityStart).isSame(startTimeChosenTimestamp) &&
         moment(availabilityEnd).isAfter(endTimeChosenTimestamp)
       ) {
-        console.log("INSIDE #2");
+
         newAvailabilityStart = endTimeChosenTimestamp;
 
         [
