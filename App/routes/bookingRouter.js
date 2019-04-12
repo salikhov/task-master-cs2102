@@ -237,8 +237,7 @@ router.get("/new/:id", checkUserLoggedIn, function(req, res, next) {
           }
         );
       },
-      /*  "select * from availability where workerid in (SELECT workerid from services where serviceID =$1) " + "order by starttime asc;" ,
-          [req.params.id],*/
+ 
       function(parallel_done) {
         pool.query(
           "select * from availability where workerid in (SELECT workerid from services where serviceID = '" +
@@ -252,7 +251,8 @@ router.get("/new/:id", checkUserLoggedIn, function(req, res, next) {
         );
       },
       function(parallel_done) {
-        pool.query("select * from discounts;", function(err, discountCodes) {
+        pool.query("select discountid, promocode, percent, amount from discounts as D1 where not exists(select discountid from" +
+        " billingDetails where discountid=D1.discountid);", function(err, discountCodes) {
           if (err) return parallel_done(err);
           return_data.discountCodes = discountCodes;
           parallel_done();
