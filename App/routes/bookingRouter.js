@@ -90,7 +90,7 @@ router.get("/cancel/:id", checkUserLoggedIn, checkPermissions, function(
 ) {
   pool.query(
     "delete from billingdetails C using bookingdetails B" +
-      " where B.billingid = C.billingid and B.bookingid = $1 and endtime >= NOW()",
+      " where B.billingid = C.billingid and B.bookingid = $1 and endtime >= NOW() returning B.starttime, B.endtime, B.workerid",
     [req.params.id],
     function(err, data) {
       if (err) {
@@ -101,8 +101,18 @@ router.get("/cancel/:id", checkUserLoggedIn, checkPermissions, function(
         req.flash("warning", "Booking cannot be cancelled");
         res.redirect("/booking");
       }
-      req.flash("success", "Booking cancelled");
-      res.redirect("/booking");
+      pool.query(
+        "insert into availability (workerid, starttime, endtime) values ($1, $2, $3)",
+        [data.rows[0].workerid, data.rows[0].starttime, data.rows[0].endtime],
+        function(err, data) {
+          if (err) {
+            genericError(req, res, "/booking");
+            return;
+          }
+          req.flash("success", "Booking cancelled");
+          res.redirect("/booking");
+        }
+      );
     }
   );
 });

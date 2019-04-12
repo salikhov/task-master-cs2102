@@ -235,7 +235,7 @@ router.get(
   function(req, res, next) {
     pool.query(
       "delete from billingdetails C using bookingdetails B" +
-        " where B.billingid = C.billingid and B.bookingid = $1 and endtime >= NOW()",
+        " where B.billingid = C.billingid and B.bookingid = $1 and endtime >= NOW() returning B.starttime, B.endtime, B.workerid",
       [req.params.id],
       function(err, data) {
         if (err) {
@@ -244,10 +244,20 @@ router.get(
         }
         if (data.rowCount === 0) {
           req.flash("warning", "Booking cannot be cancelled");
-          res.redirect("/booking");
+          res.redirect("/worker/bookings");
         }
-        req.flash("success", "Booking cancelled");
-        res.redirect("/worker/bookings");
+        pool.query(
+          "insert into availability (workerid, starttime, endtime) values ($1, $2, $3)",
+          [data.rows[0].workerid, data.rows[0].starttime, data.rows[0].endtime],
+          function(err, data) {
+            if (err) {
+              genericError(req, res, "/worker/bookings");
+              return;
+            }
+            req.flash("success", "Booking cancelled");
+            res.redirect("/worker/bookings");
+          }
+        );
       }
     );
   }
