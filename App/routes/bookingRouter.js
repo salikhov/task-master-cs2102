@@ -5,6 +5,7 @@ const { checkLoggedIn, checkUserLoggedIn } = require("./middleware/auth");
 const { genericError } = require("../db/util");
 const pool = require("../db");
 const moment = require("moment");
+let workerIDGlobal;
 
 let return_data = {};
 
@@ -192,124 +193,375 @@ router.get("/view/:id", checkLoggedIn, checkPermissions, function(
   });
 });
 
-// This is a post because you should only be able to get to it when you click on
-// a button from the services page, you shouldn't just be able to type it in
-/* POST new - Booking Form */
-router.post("/new", checkUserLoggedIn, function(req, res, next) {
+function enumerateDaysBetweenDates(startDate, endDate) {
+  console.log("enumarete", startDate, endDate);
+  var now = startDate.clone(),
+    dates = [];
+
+  while (now.isSameOrBefore(endDate)) {
+    dates.push(now.format("YYYY-MM-DD HH:mm"));
+    now.add(1, "days");
+  }
+  return dates;
+}
+
+// Get to this from services page
+/* GET new - Booking Form */
+router.get("/new/:id", checkUserLoggedIn, function(req, res, next) {
   async.parallel(
     [
       function(parallel_done) {
-        pool.query("select * from services order by name, price asc", function(
-          err,
-          services
-        ) {
+        const retrieveServiceDetails_query =
+          "SELECT * from services where serviceID ='" + req.params.id + "';";
+        pool.query(retrieveServiceDetails_query, function(err, services) {
           if (err) return parallel_done(err);
-          return_data.services = services;
+          return_data.serviceDetails = services;
           parallel_done();
         });
       },
       function(parallel_done) {
         pool.query(
-          "select * from workers natural join accounts order by firstname asc",
+          "select * from workers natural join accounts order by firstname asc;",
           function(err, workers) {
             if (err) return parallel_done(err);
             return_data.workers = workers;
             parallel_done();
           }
         );
+      },
+      /*  "select * from availability where workerid in (SELECT workerid from services where serviceID =$1) " + "order by starttime asc;" ,
+          [req.params.id],*/
+      function(parallel_done) {
+        pool.query(
+          "select * from availability where workerid in (SELECT workerid from services where serviceID = '" +
+            req.params.id +
+            "')order by starttime asc;",
+          function(err, availability) {
+            if (err) return parallel_done(err);
+            return_data.availability = availability;
+            parallel_done();
+          }
+        );
+      },
+      function(parallel_done) {
+        pool.query("select * from discounts;", function(err, discountCodes) {
+          if (err) return parallel_done(err);
+          return_data.discountCodes = discountCodes;
+          parallel_done();
+        });
       }
     ],
     function(err) {
+      var datesAvailable = [];
+      for (let i = 0; i < return_data.availability.rows.length; i++) {
+        console.log(return_data.availability.rows);
+        const daysBetweenDates = enumerateDaysBetweenDates(
+          moment(return_data.availability.rows[i].starttime).startOf("day"),
+          moment(return_data.availability.rows[i].endtime).startOf("day")
+        );
+        console.log(daysBetweenDates);
+        for (let j = 0; j < daysBetweenDates.length; j++) {
+          datesAvailable.push(daysBetweenDates[j]);
+        }
+      }
+      console.log(datesAvailable);
+      let uniquedatesAvailable = [...new Set(datesAvailable)];
+      console.log("UNIQ", uniquedatesAvailable);
       if (err) console.log(err);
       res.render("booking/new", {
         title: "New Booking",
         navCat: "booking",
         workers: return_data.workers.rows,
-        services: return_data.services.rows,
-        loggedIn: req.user
+        loggedIn: req.user,
+        serviceDetails: return_data.serviceDetails.rows,
+        availability: return_data.availability.rows,
+        datesAvailable: uniquedatesAvailable,
+        discountCodes: return_data.discountCodes.rows
       });
     }
   );
 });
 
 /* POST create - Create Booking Action */
-router.post("/create", checkUserLoggedIn, function(req, res, next) {
+router.post("/new/create", checkUserLoggedIn, function(req, res, next) {
   // Retrieve Information
-  const startTime = req.body.startTime;
-  const endTime = req.body.endTime;
+  const workTime = req.body.startTime;
+  const parsedTime = workTime.split(" - ");
+  const startTimeChosen = parsedTime[0];
+  const endTimeChosen = parsedTime[1];
+  const startTimeChosenTimestamp = moment(parsedTime[0]).format(
+    "YYYY-MM-DD HH:mm"
+  );
+  const endTimeChosenTimestamp = moment(parsedTime[1]).format(
+    "YYYY-MM-DD HH:mm"
+  );
   const address = req.body.address;
   const comments = req.body.comments;
-  const workerID = req.body.workerID;
   const serviceID = req.body.serviceID;
-  const userId = req.user.userid;
+  const userId = req.user.id;
   const cardNumber = req.body.cardNumber;
   const expDate = req.body.expDate;
   const cvv = req.body.cvv;
+  const availabilityHidden = JSON.parse(req.body.availabilityHidden);
+  const discountID = req.body.discountCodeUserMatches;
 
-  const insertBillingDetails_query =
-    "INSERT into billingdetails (cardnumber, expdate, cvv) VALUES('" +
-    cardNumber +
-    "', '" +
-    expDate +
-    "', '" +
-    cvv +
-    "');";
+  const retrieveServiceDetails_query =
+    "SELECT * from services where serviceID ='" + serviceID + "';";
+  pool.query(
+    retrieveServiceDetails_query,
+    (err, retrieveServiceDetailsData) => {
+      workerIDGlobal = retrieveServiceDetailsData.rows[0].workerid;
 
-  const retrieveBillingID_query =
-    "select * from billingdetails where cardNumber='" + cardNumber + "';";
+      const retrieveWorkerAccount_query =
+        "SELECT * from accounts where id = '" +
+        retrieveServiceDetailsData.rows[0].workerid +
+        "';";
+      pool.query(
+        retrieveWorkerAccount_query,
+        (err, retrieveWorkerAccountData) => {
+          const insertBillingDetails_query = discountID
+            ? "INSERT into billingdetails VALUES(DEFAULT, '" +
+              cardNumber +
+              "', '" +
+              expDate +
+              "', '" +
+              cvv +
+              "', " +
+              discountID +
+              ");"
+            : "INSERT into billingdetails(billingid, cardnumber,expdate, cvv) VALUES(DEFAULT, '" +
+              cardNumber +
+              "', '" +
+              expDate +
+              "', '" +
+              cvv +
+              "');";
+          console.log(insertBillingDetails_query);
 
-  pool.query(insertBillingDetails_query, (err, data1) => {
-    pool.query(retrieveBillingID_query, (err, data2) => {
-      const insertBookingDetails_query =
-        "INSERT into bookingdetails values(DEFAULT,'" +
-        startTime +
-        "','" +
-        endTime +
-        "','" +
-        address +
-        "','" +
-        comments +
-        "','" +
-        data2.rows[0].billingid +
-        "','" +
-        userId +
-        "','" +
-        workerID +
-        "','" +
-        serviceID +
-        "');";
+          pool.query(
+            insertBillingDetails_query,
+            (err, insertBillingDetailsData) => {
+              const retrieveBillingID_query =
+                "select * from billingdetails where cardNumber=$1 and expDate=$2 and cvv=$3";
 
-      pool.query(insertBookingDetails_query, (err, data3) => {
-        const retrieveWorker_query =
-          "SELECT * from workers where workerID ='" + workerID + "';";
+              pool.query(
+                retrieveBillingID_query,
+                [cardNumber, expDate, cvv],
+                (err, retrieveBillingIDData) => {
+                  const billingID =
+                    retrieveBillingIDData.rows[
+                      retrieveBillingIDData.rows.length - 1
+                    ].billingid;
+                  console.log(retrieveBillingIDData);
+                  // if(err){
+                  //   console.log("retrieve billing id",)
+                  //   genericError(req, res);
+                  // }else{
+                  console.log(
+                    retrieveBillingID_query,
+                    cardNumber,
+                    expDate,
+                    cvv
+                  );
+                  const insertBookingDetails_query =
+                    "INSERT into bookingdetails values(DEFAULT,'" +
+                    startTimeChosenTimestamp +
+                    "','" +
+                    endTimeChosenTimestamp +
+                    "','" +
+                    address +
+                    "','" +
+                    comments +
+                    "','" +
+                    billingID +
+                    "','" +
+                    userId +
+                    "','" +
+                    retrieveServiceDetailsData.rows[0].workerid +
+                    "','" +
+                    retrieveServiceDetailsData.rows[0].serviceid +
+                    "');";
+                  console.log(insertBookingDetails_query);
+                  pool.query(
+                    insertBookingDetails_query,
+                    (err, insertBookingDetailsData) => {
+                      console.log(insertBookingDetailsData);
+                      const retrieveWorkerPhone_query =
+                        "SELECT * from workers where id ='" +
+                        retrieveServiceDetailsData.rows[0].workerid +
+                        "';";
 
-        pool.query(retrieveWorker_query, (err, data4) => {
-          const retrieveBookingID_query =
-            "SELECT * from bookingdetails where address='" +
-            address +
-            "' and starttime='" +
-            startTime +
-            "';";
+                      pool.query(
+                        retrieveWorkerPhone_query,
+                        (err, retrieveWorkerPhoneData) => {
+                          const retrieveBookingID_query =
+                            "SELECT * from bookingdetails where userid='" +
+                            userId +
+                            "' and starttime='" +
+                            startTimeChosenTimestamp +
+                            "' and billingid='" +
+                            billingID +
+                            "';";
+                          console.log(retrieveBookingID_query);
 
-          // TODO redirect to view instead of summary
-          pool.query(retrieveBookingID_query, (err, data5) => {
-            res.render("booking/summary", {
-              workerDetails: data4.rows[0],
-              title: "Booking Summary",
-              navCat: "booking",
-              loggedIn: req.user,
-              startTime: startTime,
-              endTime: endTime,
-              address: address,
-              comments: comments,
-              cardNumberTrimmed: cardNumber.substring(12, 16),
-              bookingID: data5.rows[0].bookingid
-            });
-          });
-        });
-      });
-    });
-  });
+                          pool.query(
+                            retrieveBookingID_query,
+                            (err, retrieveBookingIDData) => {
+                              if (err) {
+                                genericError(req, res);
+                                return;
+                              } else {
+                                updateAvailabilities(workerIDGlobal);
+                              }
+                              req.flash(
+                                "success",
+                                "Booking created successfully!"
+                              );
+                              res.redirect(
+                                "/booking/view/" +
+                                  retrieveBookingIDData.rows[0].bookingid
+                              );
+                            }
+                          );
+                        }
+                      );
+                    }
+                  );
+                }
+              );
+            }
+          );
+        }
+      );
+    }
+  );
+
+  function updateAvailabilities(workerID) {
+    for (let i = 0; i < availabilityHidden.length; i++) {
+      console.log("INSIDE FOR LOOP");
+      availabilityStart = moment(availabilityHidden[i].starttime).format(
+        "YYYY-MM-DD HH:mm"
+      );
+      availabilityEnd = moment(availabilityHidden[i].endtime).format(
+        "YYYY-MM-DD HH:mm"
+      );
+      let newAvailabilityStart = availabilityStart;
+      let newAvailabilityEnd = availabilityEnd;
+      let newAvailabilityStart2 = availabilityStart;
+      let newAvailabilityEnd2 = availabilityEnd;
+      console.log("AVAILABIILITY", availabilityStart, startTimeChosenTimestamp);
+      const updateAvailability_query =
+        "update availability SET starttime=$1, endtime=$2 where (workerid=$3 and starttime=$4)" +
+        " and endtime=$5";
+      let deleteAvailability_query = null;
+      let insertAvailability_query = null;
+      let shouldUpdate = true;
+      if (
+        moment(availabilityStart).isBefore(startTimeChosenTimestamp) &&
+        moment(availabilityEnd).isAfter(endTimeChosenTimestamp)
+      ) {
+        console.log("INSIDE #1");
+        newAvailabilityEnd = startTimeChosenTimestamp;
+        newAvailabilityStart2 = endTimeChosenTimestamp;
+        insertAvailability_query =
+          "Insert into availability values($1, $2, $3)";
+        deleteAvailability_query =
+          "delete from availability where workerid=$1, starttime=$2, endtime=$3";
+        //                "insert into accounts (email, salt, hash, firstName, lastName) VALUES ($1, $2, $3, $4, $5) returning id;",
+        // [
+        //   req.body.email,
+        //   salt,
+        //   hash,
+        //   req.body.firstName,
+        //   req.body.lastName
+        // ],
+      } else if (
+        moment(availabilityStart).isSame(startTimeChosenTimestamp) &&
+        moment(availabilityEnd).isAfter(endTimeChosenTimestamp)
+      ) {
+        console.log("INSIDE #2");
+        newAvailabilityStart = endTimeChosenTimestamp;
+
+        [
+          newAvailabilityStart,
+          newAvailabilityEnd,
+          workerID,
+          availabilityStart,
+          availabilityEnd
+        ];
+      } else if (
+        moment(availabilityStart).isBefore(startTimeChosenTimestamp) &&
+        moment(availabilityEnd).isSame(endTimeChosenTimestamp)
+      ) {
+        console.log("INSIDE #3");
+        newAvailabilityEnd = startTimeChosenTimestamp;
+        [
+          newAvailabilityStart,
+          newAvailabilityEnd,
+          workerID,
+          availabilityStart,
+          availabilityEnd
+        ];
+      } else if (
+        moment(availabilityStart).isSame(startTimeChosenTimestamp) &&
+        moment(availabilityEnd).isSame(endTimeChosenTimestamp)
+      ) {
+        console.log("INSIDE #4");
+        shouldUpdate = false;
+        deleteAvailability_query =
+          "delete from availability where workerid=$1, starttime=$2, endtime=$3;";
+      } else {
+        shouldUpdate = false;
+      }
+
+      if (shouldUpdate) {
+        console.log("UPDATE");
+        pool.query(
+          updateAvailability_query,
+          [
+            newAvailabilityStart,
+            newAvailabilityEnd,
+            workerID,
+            availabilityStart,
+            availabilityEnd
+          ],
+          (err, updateAvailabilityData) => {
+            console.log(
+              updateAvailability_query,
+              newAvailabilityStart,
+              newAvailabilityEnd,
+              workerID,
+              availabilityStart,
+              availabilityEnd
+            );
+            console.log(err, updateAvailabilityData);
+          }
+        );
+      }
+      if (insertAvailability_query) {
+        console.log("INSERT");
+        pool.query(
+          insertAvailability_query,
+          [workerID, newAvailabilityStart2, newAvailabilityEnd2],
+          (err, insertAvailabilityData) => {
+            console.log(err, insertAvailabilityData);
+          }
+        );
+      }
+      if (deleteAvailability_query) {
+        console.log("DELETE");
+        pool.query(
+          deleteAvailability_query,
+          [workerID, availabilityStart, availabilityEnd],
+          (err, deleteAvailabilityData) => {
+            console.log(err, deleteAvailabilityData);
+          }
+        );
+      }
+    }
+  }
+
+  /////
 });
 
 module.exports = router;
